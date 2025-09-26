@@ -1,14 +1,15 @@
 {
   "expo": {
-    "name": "firebasechat",
-    "slug": "firebasechat",
+    "name": "FireChat",
+    "slug": "firechat",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "icon": "./assets/icons/icon-white-bg.png",
+    "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "scheme": "com.alck.firechat",
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/icons/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -17,13 +18,17 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/icons/icon-white-bg.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true
     },
     "web": {
-      "favicon": "./assets/favicon.png"
-    }
+      "favicon": "./assets/icons/icon-white-bg.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font"
+    ]
   }
 }
