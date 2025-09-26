@@ -22,28 +22,28 @@ const onboardingData = [
     title: "Chat Anywhere",
     description:
       "Stay connected with friends and colleagues instantly, no matter where you are in the world.",
-    image: require("../assets/onboarding/onboarding1.jpg"),
+    image: require("../assets/onboarding/onboarding1.png"),
   },
   {
     id: 2,
     title: "Share Moments",
     description:
       "Send photos, voice notes, and emojis to make your conversations more lively and personal.",
-    image: require("../assets/onboarding/onboarding2.jpg"),
+    image: require("../assets/onboarding/onboarding2.png"),
   },
   {
     id: 3,
     title: "Stay Notified",
     description:
       "Get real-time updates so you never miss an important message or group conversation.",
-    image: require("../assets/onboarding/onboarding4.jpg"),
+    image: require("../assets/onboarding/onboarding3.png"),
   },
   {
     id: 4,
     title: "Private & Secure",
     description:
       "Your chats are encrypted, giving you full privacy and peace of mind while messaging.",
-    image: require("../assets/onboarding/onboarding5.jpg"),
+    image: require("../assets/onboarding/onboarding4.png"),
   },
 ];
 
@@ -293,7 +293,7 @@ const createStyles = (Colors, Fonts, Styles) =>
       opacity: 0.9,
     },
     buttonLabel: {
-      color: Colors.wb,
+      color: Colors.white,
       fontSize: Fonts.sizes.lg,
       fontFamily: Fonts.family.FredokaRegular,
     },
