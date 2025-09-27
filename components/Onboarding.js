@@ -108,7 +108,7 @@ const Onboarding = () => {
       setButtonLoading(true);
       setTimeout(() => {
         setButtonLoading(false);
-        router.push("/login");
+        router.push("/setup");
       }, 1000);
     } else {
       handleScroll("right");
@@ -152,12 +152,16 @@ const Onboarding = () => {
           variant="text"
           titleStyle={styles.headerButton}
         />
-        <Button
-          title="Skip"
-          onPress={handleSkipPress}
-          variant="text"
-          titleStyle={styles.headerButton}
-        />
+        {activeIndex === onboardingData.length - 1 ? (
+          <View />
+        ) : (
+          <Button
+            title="Skip"
+            onPress={handleSkipPress}
+            variant="text"
+            titleStyle={styles.headerButton}
+          />
+        )}
       </View>
       <ScrollView
         ref={scrollViewRef}

@@ -2613,6 +2613,11 @@ expo-asset@~12.0.9:
     "@expo/image-utils" "^0.8.7"
     expo-constants "~18.0.9"
 
+expo-blur@~15.0.7:
+  version "15.0.7"
+  resolved "https://registry.yarnpkg.com/expo-blur/-/expo-blur-15.0.7.tgz#a11466e697fbf2b272444a38722065e60d0ecbe5"
+  integrity sha512-SugQQbQd+zRPy8z2G5qDD4NqhcD7srBF7fN7O7yq6q7ZFK59VWvpDxtMoUkmSfdxgqONsrBN/rLdk00USADrMg==
+
 expo-constants@~18.0.8, expo-constants@~18.0.9:
   version "18.0.9"
   resolved "https://registry.yarnpkg.com/expo-constants/-/expo-constants-18.0.9.tgz#fcaf37e97ea2b928bd3b92f2ea9836984ab6e48b"
@@ -4174,6 +4179,11 @@ postcss@~8.4.32:
     nanoid "^3.3.7"
     picocolors "^1.1.1"
     source-map-js "^1.2.1"
+
+pressto@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/pressto/-/pressto-0.2.1.tgz#8578220204621a5c3eafbcf20460d14ea480cb3c"
+  integrity sha512-tjZE/1x7pPVIYU1lbmxAbZ36xP1nsBXnEHv9BIlnrK/6LezA+0vDFehoNVzbyCJjuTM+d2pd9z07vEkVH1F9gw==
 
 pretty-bytes@^5.6.0:
   version "5.6.0"

@@ -14,6 +14,12 @@ export const Colors = {
     text: "#OOOOOO",
     primaryBlue: "#2196F3",
     primaryYellow: "#FFC107",
+    primaryGray: "#9B9893",
+    baseGray05: "#F5F3EE",
+    baseGray80: "#30302E",
+    fluidtabbackground: "#F9F8F4",
+    highlightLabel: "#312F2D",
+    baseLabel: "#9B9893",
   },
   dark: {
     black: "#000000",
@@ -28,6 +34,12 @@ export const Colors = {
     text: "#ffffff",
     primaryBlue: "#2196F3",
     primaryYellow: "#FFC107",
+    primaryGray: "#9B9893",
+    baseGray05: "#30302E",
+    baseGray80: "#30302E",
+    fluidtabbackground: "gray",
+    highlightLabel: "#312F2D",
+    baseLabel: "#9B9893",
   },
 };
 
