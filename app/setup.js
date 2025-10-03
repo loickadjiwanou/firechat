@@ -14,10 +14,12 @@ import { StatusBar } from "expo-status-bar";
 import FluidTabInteraction from "../components/FluidTabInteraction";
 import Button from "../components/Button";
 import { isValidEmail } from "../utils/validators";
+import { Feather } from "@expo/vector-icons";
 
 const LoginForm = React.memo(({ onSubmit }) => {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [showPassword, setShowPassword] = React.useState(false);
   const { Colors, Fonts, Styles } = useTheme();
   const styles = createStyles(Colors, Fonts, Styles);
 
@@ -48,9 +50,16 @@ const LoginForm = React.memo(({ onSubmit }) => {
           onChangeText={(text) => {
             setPassword(text);
           }}
-          secureTextEntry
+          secureTextEntry={!showPassword}
           autoCapitalize="none"
           autoCorrect={false}
+        />
+        <Feather
+          name={!showPassword ? "eye" : "eye-off"}
+          size={24}
+          color={Colors.bw + "80"}
+          onPress={() => setShowPassword(!showPassword)}
+          style={styles.eyeIcon}
         />
       </View>
 
@@ -69,6 +78,8 @@ const RegisterForm = React.memo(({ onSubmit }) => {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [showPasswordC, setShowPasswordC] = React.useState(false);
   const { Colors, Fonts, Styles } = useTheme();
   const styles = createStyles(Colors, Fonts, Styles);
 
@@ -115,9 +126,16 @@ const RegisterForm = React.memo(({ onSubmit }) => {
           onChangeText={(text) => {
             setPassword(text);
           }}
-          secureTextEntry
+          secureTextEntry={!showPassword}
           autoCapitalize="none"
           autoCorrect={false}
+        />
+        <Feather
+          name={!showPassword ? "eye" : "eye-off"}
+          size={24}
+          color={Colors.bw + "80"}
+          onPress={() => setShowPassword(!showPassword)}
+          style={styles.eyeIcon}
         />
       </View>
 
@@ -131,9 +149,16 @@ const RegisterForm = React.memo(({ onSubmit }) => {
           onChangeText={(text) => {
             setConfirmPassword(text);
           }}
-          secureTextEntry
+          secureTextEntry={!showPasswordC}
           autoCapitalize="none"
           autoCorrect={false}
+        />
+        <Feather
+          name={!showPasswordC ? "eye" : "eye-off"}
+          size={24}
+          color={Colors.bw + "80"}
+          onPress={() => setShowPasswordC(!showPasswordC)}
+          style={styles.eyeIcon}
         />
       </View>
 
@@ -293,5 +318,10 @@ const createStyles = (Colors, Fonts, Styles) =>
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.23,
       shadowRadius: 2.62,
+    },
+    eyeIcon: {
+      position: "absolute",
+      right: 15,
+      top: 40,
     },
   });
