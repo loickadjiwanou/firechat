@@ -2,6 +2,7 @@ import React from "react";
 import { Pressable, Text, ActivityIndicator, StyleSheet } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useTheme } from "../hooks/useTheme";
+import * as Haptics from "expo-haptics";
 
 const Button = ({
   title,
@@ -43,7 +44,11 @@ const Button = ({
 
   return (
     <Pressable
-      onPress={onPress}
+      // onPress={onPress}
+      onPress={async () => {
+        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        if (onPress) onPress();
+      }}
       disabled={loading}
       style={({ pressed }) => [
         buttonStyles,
@@ -81,9 +86,9 @@ const createStyles = (Colors, Fonts, Styles) =>
       flexDirection: "row",
     },
     text: {
-      fontSize: Fonts.sizes.sm,
-      fontFamily: Fonts.family.FredokaRegular,
-      color: Colors.bw,
+      fontSize: Fonts.sizes.lg,
+      fontFamily: Fonts.family.FredokaMedium,
+      color: Colors.white,
       textAlign: "center",
     },
     withIconText: {

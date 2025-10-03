@@ -13,6 +13,7 @@ import {
 import { useRouter } from "expo-router";
 import { useTheme } from "../hooks/useTheme";
 import Button from "./Button";
+import * as Haptics from "expo-haptics";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -103,7 +104,8 @@ const Onboarding = () => {
     }
   };
 
-  const handleNextPress = () => {
+  const handleNextPress = async () => {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (activeIndex === onboardingData.length - 1) {
       setButtonLoading(true);
       setTimeout(() => {

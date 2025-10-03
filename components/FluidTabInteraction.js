@@ -13,6 +13,7 @@ import { Pressable } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { useTheme } from "../hooks/useTheme";
+import * as Haptics from "expo-haptics";
 
 const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
 const AnimatedIcon = Animated.createAnimatedComponent(MaterialCommunityIcons);
@@ -23,7 +24,7 @@ const TimingConfig = {
 };
 
 const SegmentedControl = ({ data, onPress, selected, width, height }) => {
-  const internalPadding = 5;
+  const internalPadding = 1;
   const cellBackgroundWidth = width / data.length;
 
   const { Colors, Fonts, Styles } = useTheme();
@@ -32,8 +33,8 @@ const SegmentedControl = ({ data, onPress, selected, width, height }) => {
   const Palette = {
     baseGray05: Colors.baseGray05,
     baseGray80: Colors.baseGray80,
-    background: Colors.fluidtabbackground,
-    highlightLabel: Colors.highlightLabel,
+    background: Colors.primaryBlue,
+    highlightLabel: Colors.white,
     baseLabel: Colors.baseLabel,
   };
 
@@ -67,8 +68,6 @@ const SegmentedControl = ({ data, onPress, selected, width, height }) => {
           padding: internalPadding,
           flexDirection: "row",
           borderRadius: 30,
-          borderWidth: 1,
-          borderColor: Palette.baseGray05,
         },
       ]}
     >
@@ -82,8 +81,6 @@ const SegmentedControl = ({ data, onPress, selected, width, height }) => {
             position: "absolute",
             backgroundColor: Palette.background,
             borderRadius: 30,
-            borderWidth: 1,
-            borderColor: Palette.baseGray05,
             shadowOpacity: 0.15,
             shadowOffset: { height: 2, width: 0 },
             shadowRadius: 4,
@@ -103,6 +100,8 @@ const SegmentedControl = ({ data, onPress, selected, width, height }) => {
                 : Palette.baseLabel,
               TimingConfig
             ),
+            fontFamily: Fonts.family.FredokaMedium,
+            fontSize: Fonts.sizes.lg,
           };
         }, [selectedCellIndex, index]);
 
@@ -120,7 +119,10 @@ const SegmentedControl = ({ data, onPress, selected, width, height }) => {
               },
               pressed && { transform: [{ scale: 0.95 }] },
             ]}
-            onPress={() => onPress(item)}
+            onPress={async () => {
+              await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              onPress(item);
+            }}
           >
             <AnimatedIcon name={item.icon} size={18} style={rLabelStyle} />
             <Animated.Text style={[styles.text, rLabelStyle]}>

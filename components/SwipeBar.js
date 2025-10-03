@@ -7,6 +7,7 @@ import {
 import { useRouter } from "expo-router";
 import { useTheme } from "../hooks/useTheme";
 import { Feather } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 
 const { width } = Dimensions.get("window");
 const SWIPE_THRESHOLD = width * 0.6;
@@ -33,7 +34,8 @@ export default function SwipeBar({ route, onComplete }) {
     if (event.nativeEvent.state === 5) {
       if (event.nativeEvent.translationX > SWIPE_THRESHOLD) {
         onComplete();
-        setTimeout(() => {
+        setTimeout(async () => {
+          await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
           router.push(`${route}`);
         }, 150);
       } else {
