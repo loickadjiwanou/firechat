@@ -21,7 +21,7 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { auth } from "../configs/firebaseConfig";
-import { showToast } from "../utils/toasts";
+import { useToast } from "../hooks/useToast";
 
 const LoginForm = React.memo(({ onSubmit }) => {
   const [email, setEmail] = React.useState("");
@@ -175,11 +175,13 @@ export default function Setup() {
   const router = useRouter();
   const { Colors, Fonts, Styles } = useTheme();
   const styles = createStyles(Colors, Fonts, Styles);
+  const { showToast } = useToast();
 
   const handleLogin = () => {
     showToast({
       type: "success",
       message: "Login successful",
+      theme: "dark",
     });
   };
 
