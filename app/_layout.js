@@ -4,6 +4,7 @@ import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { Stack } from "expo-router";
 import { useTheme } from "../hooks/useTheme";
+import ToastManager from "toastify-react-native";
 
 const ThemedStatusBar = () => {
   const { theme } = useTheme();
@@ -50,6 +51,7 @@ export default function RootLayout() {
         <Stack.Screen name="onboarding" options={{ headerShown: false }} />
         <Stack.Screen name="setup" options={{ headerShown: false }} />
       </Stack>
+      <ToastManager />
       <ThemedStatusBar />
     </>
   );

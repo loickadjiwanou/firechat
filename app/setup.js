@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -15,11 +15,19 @@ import FluidTabInteraction from "../components/FluidTabInteraction";
 import Button from "../components/Button";
 import { isValidEmail } from "../utils/validators";
 import { Feather } from "@expo/vector-icons";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
+import { auth } from "../configs/firebaseConfig";
+import { showToast } from "../utils/toasts";
 
 const LoginForm = React.memo(({ onSubmit }) => {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
   const { Colors, Fonts, Styles } = useTheme();
   const styles = createStyles(Colors, Fonts, Styles);
 
@@ -32,9 +40,7 @@ const LoginForm = React.memo(({ onSubmit }) => {
           placeholder="Enter your email"
           placeholderTextColor={Colors.bw + "80"}
           value={email}
-          onChangeText={(text) => {
-            setEmail(text);
-          }}
+          onChangeText={(text) => setEmail(text)}
           autoCapitalize="none"
           autoCorrect={false}
         />
@@ -47,9 +53,7 @@ const LoginForm = React.memo(({ onSubmit }) => {
           placeholder="Enter your password"
           placeholderTextColor={Colors.bw + "80"}
           value={password}
-          onChangeText={(text) => {
-            setPassword(text);
-          }}
+          onChangeText={(text) => setPassword(text)}
           secureTextEntry={!showPassword}
           autoCapitalize="none"
           autoCorrect={false}
@@ -65,8 +69,8 @@ const LoginForm = React.memo(({ onSubmit }) => {
 
       <Button
         title={"Login"}
-        loading={false}
-        onPress={() => onSubmit({ email, password })}
+        loading={loading}
+        onPress={() => onSubmit({ email, password, setLoading })}
         style={styles.button}
       />
     </View>
@@ -80,6 +84,7 @@ const RegisterForm = React.memo(({ onSubmit }) => {
   const [confirmPassword, setConfirmPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
   const [showPasswordC, setShowPasswordC] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
   const { Colors, Fonts, Styles } = useTheme();
   const styles = createStyles(Colors, Fonts, Styles);
 
@@ -92,9 +97,7 @@ const RegisterForm = React.memo(({ onSubmit }) => {
           placeholder="Enter your full name"
           placeholderTextColor={Colors.bw + "80"}
           value={fullName}
-          onChangeText={(text) => {
-            setFullName(text);
-          }}
+          onChangeText={(text) => setFullName(text)}
           autoCapitalize="words"
           autoCorrect={false}
         />
@@ -107,9 +110,7 @@ const RegisterForm = React.memo(({ onSubmit }) => {
           placeholder="Enter your email"
           placeholderTextColor={Colors.bw + "80"}
           value={email}
-          onChangeText={(text) => {
-            setEmail(text);
-          }}
+          onChangeText={(text) => setEmail(text)}
           keyboardType="email-address"
           autoCapitalize="none"
           autoCorrect={false}
@@ -123,9 +124,7 @@ const RegisterForm = React.memo(({ onSubmit }) => {
           placeholder="Create a password"
           placeholderTextColor={Colors.bw + "80"}
           value={password}
-          onChangeText={(text) => {
-            setPassword(text);
-          }}
+          onChangeText={(text) => setPassword(text)}
           secureTextEntry={!showPassword}
           autoCapitalize="none"
           autoCorrect={false}
@@ -146,9 +145,7 @@ const RegisterForm = React.memo(({ onSubmit }) => {
           placeholder="Confirm your password"
           placeholderTextColor={Colors.bw + "80"}
           value={confirmPassword}
-          onChangeText={(text) => {
-            setConfirmPassword(text);
-          }}
+          onChangeText={(text) => setConfirmPassword(text)}
           secureTextEntry={!showPasswordC}
           autoCapitalize="none"
           autoCorrect={false}
@@ -164,8 +161,10 @@ const RegisterForm = React.memo(({ onSubmit }) => {
 
       <Button
         title={"Create Account"}
-        loading={false}
-        onPress={() => onSubmit({ fullName, email, password, confirmPassword })}
+        loading={loading}
+        onPress={() =>
+          onSubmit({ fullName, email, password, confirmPassword, setLoading })
+        }
         style={styles.button}
       />
     </View>
@@ -173,61 +172,131 @@ const RegisterForm = React.memo(({ onSubmit }) => {
 });
 
 export default function Setup() {
-  const route = useRouter();
+  const router = useRouter();
   const { Colors, Fonts, Styles } = useTheme();
   const styles = createStyles(Colors, Fonts, Styles);
+
+  const handleLogin = () => {
+    showToast({
+      type: "success",
+      message: "Login successful",
+    });
+  };
+
+  const handleLogin2 = async ({ email, password, setLoading }) => {
+    if (!email || !password) {
+      Alert.alert("Error", "Please fill in all fields.");
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      Alert.alert("Error", "Please enter a valid email address.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+      console.log("User logged in:", user.email);
+      Alert.alert("Success", `Welcome, ${user.email}!`);
+      router.push("/home"); // Redirect to home screen
+    } catch (error) {
+      console.error("Login error:", error);
+      let message = "Error during login";
+      switch (error.code) {
+        case "auth/user-not-found":
+          message = "User not found";
+          break;
+        case "auth/wrong-password":
+          message = "Incorrect password";
+          break;
+        case "auth/invalid-email":
+          message = "Invalid email address";
+          break;
+        case "auth/too-many-requests":
+          message = "Too many attempts, please try again later";
+          break;
+        default:
+          message = error.message;
+      }
+      Alert.alert("Error", message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRegister = async ({
+    fullName,
+    email,
+    password,
+    confirmPassword,
+    setLoading,
+  }) => {
+    if (!fullName || !email || !password || !confirmPassword) {
+      Alert.alert("Error", "Please fill in all fields.");
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      Alert.alert("Error", "Please enter a valid email address.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert("Error", "Passwords do not match.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+      await updateProfile(user, { displayName: fullName });
+      console.log("User registered:", user.email);
+      Alert.alert("Success", `Account created for ${user.email}!`);
+      router.push("/home"); // Redirect to home screen
+    } catch (error) {
+      console.error("Registration error:", error);
+      let message = "Error during registration";
+      switch (error.code) {
+        case "auth/email-already-in-use":
+          message = "This email is already in use";
+          break;
+        case "auth/weak-password":
+          message = "Password is too weak (minimum 6 characters)";
+          break;
+        case "auth/invalid-email":
+          message = "Invalid email address";
+          break;
+        default:
+          message = error.message;
+      }
+      Alert.alert("Error", message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const tabs = useMemo(
     () => [
       {
         id: "login",
         name: "Login",
-        content: (
-          <LoginForm
-            onSubmit={({ email, password }) => {
-              if (!email || !password) {
-                Alert.alert("Error", "Please fill in all fields.");
-                return;
-              }
-
-              if (!isValidEmail(email)) {
-                Alert.alert("Error", "Please enter a valid email address.");
-                return;
-              }
-
-              Alert.alert(
-                "Connection",
-                `Email: ${email}\nPassword: ${password}`
-              );
-            }}
-          />
-        ),
+        content: <LoginForm onSubmit={handleLogin} />,
       },
       {
         id: "register",
         name: "Register",
-        content: (
-          <RegisterForm
-            onSubmit={({ fullName, email, password, confirmPassword }) => {
-              if (!fullName || !email || !password || !confirmPassword) {
-                Alert.alert("Error", "Please fill in all fields.");
-                return;
-              }
-              if (!isValidEmail(email)) {
-                Alert.alert("Error", "Please enter a valid email address.");
-                return;
-              }
-              if (password !== confirmPassword) {
-                Alert.alert("Error", "Passwords do not match.");
-                return;
-              }
-              Alert.alert(
-                "Registration",
-                `Full Name: ${fullName}\nEmail: ${email}\nPassword: ${password}`
-              );
-            }}
-          />
-        ),
+        content: <RegisterForm onSubmit={handleRegister} />,
       },
     ],
     []
@@ -247,7 +316,7 @@ export default function Setup() {
         defaultTabId="login"
         width={375}
         height={50}
-        // onTabChange={(tab) => console.log(`Selected tab : ${tab.name}`)}
+        onTabChange={(tab) => console.log(`Selected tab: ${tab.name}`)}
         contentStyle={{ backgroundColor: Colors.background }}
       />
     </ScrollView>
