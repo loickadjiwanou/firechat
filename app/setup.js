@@ -6,10 +6,12 @@ import {
   Platform,
   ScrollView,
   TextInput,
+  Pressable,
+  TouchableOpacity,
 } from "react-native";
 import { useTheme } from "../hooks/useTheme";
 import { useToast } from "../hooks/useToast";
-import { useRouter } from "expo-router";
+import { router, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import FluidTabInteraction from "../components/FluidTabInteraction";
 import Button from "../components/Button";
@@ -66,6 +68,15 @@ const LoginForm = React.memo(({ onSubmit }) => {
           style={styles.eyeIcon}
         />
       </View>
+
+      <TouchableOpacity
+        style={styles.forgotPasswordContainer}
+        onPress={() => router.push("/forgotpassword")}
+        hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
+        activeOpacity={Styles.opacity.xl}
+      >
+        <Text style={styles.forgotPassword}>Forgot Password?</Text>
+      </TouchableOpacity>
 
       <Button
         title={"Login"}
@@ -372,5 +383,15 @@ const createStyles = (Colors, Fonts, Styles) =>
       position: "absolute",
       right: 15,
       top: 36,
+    },
+    forgotPasswordContainer: {
+      alignSelf: "flex-end",
+      top: -10,
+    },
+    forgotPassword: {
+      fontFamily: Fonts.family.FredokaRegular,
+      fontSize: Fonts.sizes.md,
+      color: Colors.primaryBlue,
+      opacity: Styles.opacity.xlg,
     },
   });

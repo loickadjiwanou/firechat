@@ -2,7 +2,7 @@ import { Toast } from "toastify-react-native";
 import { useTheme } from "./useTheme";
 
 export const useToast = () => {
-  const { Colors, theme } = useTheme();
+  const { Colors, Fonts, Styles, theme } = useTheme();
 
   const showToast = ({
     type = "success", // 'success' | 'error' | 'info' | 'warn' | 'default'
@@ -37,13 +37,15 @@ export const useToast = () => {
       onShow,
       onPress,
       onHide,
-      progressBarColor: Colors.primaryBlue || "#007BFF",
-      text1Style: { color: textColor || Colors.text || "#fff" },
-      text2Style: { color: textColor || Colors.text || "#fff" },
+      progressBarColor: Colors.white,
+      // backgroundColor === Colors.primaryBlue ? "#fff" : Colors.primaryBlue,
+      textColor: Colors.white,
+      text1Style: { fontFamily: Fonts.family.FredokaRegular },
+      text2Style: { fontFamily: Fonts.family.FredokaRegular },
       backgroundColor: backgroundColor || getBackgroundColor(type),
       icon: icon || getDefaultIcon(type),
       iconFamily,
-      iconColor: iconColor || "#fff",
+      iconColor: iconColor || Colors.white,
       iconSize,
       theme,
       useModal,
