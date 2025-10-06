@@ -1,9 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Platform, StatusBar } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Platform,
+  StatusBar,
+  ScrollView,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { useTheme } from "../hooks/useTheme";
 import { useToast } from "../hooks/useToast";
 import Button from "../components/Button";
+import { Ionicons } from "@expo/vector-icons";
 import {
   checkAllPermissions,
   requestCameraPermission,
@@ -11,23 +19,28 @@ import {
   requestLocationPermission,
   requestStoragePermission,
   requestPhoneCallPermission,
-} from "../hooks/usePermissions";
+} from "../hooks/usePermissionsManager";
 
 export default function PermissionsScreen() {
   const { Colors, Fonts, Styles } = useTheme();
   const { showToast } = useToast();
   const router = useRouter();
   const [permissionsStatus, setPermissionsStatus] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loadingStates, setLoadingStates] = useState({
+    camera: false,
+    audio: false,
+    location: false,
+    storage: false,
+    phoneCall: false,
+  });
   const styles = createStyles(Colors, Fonts, Styles);
 
-  // Vérifier les permissions au montage
   useEffect(() => {
     const checkPermissions = async () => {
       const permissions = await checkAllPermissions();
+      console.log("Permissions status:", permissions);
       setPermissionsStatus(permissions);
 
-      // Vérifier si toutes les permissions sont accordées
       if (
         permissions.camera?.granted &&
         permissions.audio?.granted &&
@@ -37,91 +50,62 @@ export default function PermissionsScreen() {
       ) {
         showToast({
           type: "success",
-          message: "Toutes les permissions accordées",
-          subMessage: "Redirection vers l'accueil...",
+          message: "All permissions granted",
+          subMessage: "Redirecting to home...",
         });
-        setTimeout(() => router.replace("/home"), 1000); // Délai pour afficher le toast
+        // setTimeout(() => router.replace("/home"), 1000);
       }
     };
 
     checkPermissions();
   }, []);
 
-  // Demander les permissions manquantes
-  const requestMissingPermissions = async () => {
-    setLoading(true);
-    let allGranted = true;
-
-    if (!permissionsStatus?.camera?.granted) {
-      const result = await requestCameraPermission();
-      showToast({
-        type: result.granted ? "success" : "error",
-        message: result.granted ? "Caméra autorisée" : "Caméra refusée",
-        subMessage: result.error || "",
-      });
-      allGranted = allGranted && result.granted;
-    }
-
-    if (!permissionsStatus?.audio?.granted) {
-      const result = await requestAudioPermission();
-      showToast({
-        type: result.granted ? "success" : "error",
-        message: result.granted ? "Audio autorisé" : "Audio refusé",
-        subMessage: result.error || "",
-      });
-      allGranted = allGranted && result.granted;
-    }
-
-    if (!permissionsStatus?.location?.granted) {
-      const result = await requestLocationPermission();
+  const requestPermission = async (permissionType, requestFn) => {
+    setLoadingStates((prev) => ({ ...prev, [permissionType]: true }));
+    try {
+      const result = await requestFn();
       showToast({
         type: result.granted ? "success" : "error",
         message: result.granted
-          ? "Localisation autorisée"
-          : "Localisation refusée",
+          ? `${
+              permissionType.charAt(0).toUpperCase() + permissionType.slice(1)
+            } granted.`
+          : `${
+              permissionType.charAt(0).toUpperCase() + permissionType.slice(1)
+            } granted.`,
         subMessage: result.error || "",
       });
-      allGranted = allGranted && result.granted;
-    }
 
-    if (!permissionsStatus?.storage?.granted) {
-      const result = await requestStoragePermission();
+      // Mettre à jour l'état des permissions
+      const updatedPermissions = await checkAllPermissions();
+      setPermissionsStatus(updatedPermissions);
+
+      // Rediriger si toutes les permissions sont accordées
+      if (
+        updatedPermissions.camera?.granted &&
+        updatedPermissions.audio?.granted &&
+        updatedPermissions.location?.granted &&
+        updatedPermissions.storage?.granted &&
+        updatedPermissions.phoneCall?.granted
+      ) {
+        showToast({
+          type: "success",
+          message: "All permissions granted",
+          subMessage: "Redirecting to home...",
+        });
+        // setTimeout(() => router.replace("/home"), 1000);
+      }
+    } catch (error) {
       showToast({
-        type: result.granted ? "success" : "error",
-        message: result.granted ? "Stockage autorisé" : "Stockage refusé",
-        subMessage: result.error || "",
+        type: "error",
+        message: `Erreur ${permissionType}`,
+        subMessage: error.message,
       });
-      allGranted = allGranted && result.granted;
+    } finally {
+      setLoadingStates((prev) => ({ ...prev, [permissionType]: false }));
     }
-
-    if (!permissionsStatus?.phoneCall?.granted) {
-      const result = await requestPhoneCallPermission();
-      showToast({
-        type: result.granted ? "success" : "error",
-        message: result.granted ? "Appels autorisés" : "Appels refusés",
-        subMessage: result.error || "",
-      });
-      allGranted = allGranted && result.granted;
-    }
-
-    // Mettre à jour l'état des permissions
-    const updatedPermissions = await checkAllPermissions();
-    setPermissionsStatus(updatedPermissions);
-
-    // Rediriger vers /home si toutes les permissions sont accordées
-    if (allGranted) {
-      showToast({
-        type: "success",
-        message: "Toutes les permissions accordées",
-        subMessage: "Redirection vers l'accueil...",
-      });
-      setTimeout(() => router.replace("/home"), 1000);
-    }
-
-    setLoading(false);
   };
 
-  // Afficher un écran de chargement si les permissions ne sont pas encore vérifiées
   if (!permissionsStatus) {
     return (
       <View style={styles.container}>
@@ -130,50 +114,188 @@ export default function PermissionsScreen() {
     );
   }
 
+  const allPermissionsGranted =
+    permissionsStatus.camera?.granted &&
+    permissionsStatus.audio?.granted &&
+    permissionsStatus.location?.granted &&
+    permissionsStatus.storage?.granted &&
+    permissionsStatus.phoneCall?.granted;
+
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      showsVerticalScrollIndicator={false}
+    >
       <Text style={styles.title}>Autorisations Requises</Text>
       <Text style={styles.subtitle}>
-        Nous avons besoin de certaines permissions pour offrir la meilleure
-        expérience possible.
+        Nous avons besoin de ces permissions pour offrir la meilleure expérience
+        possible.
       </Text>
-      <View style={styles.statusContainer}>
-        <Text style={styles.statusText}>
-          Caméra:{" "}
-          {permissionsStatus.camera?.granted
-            ? "✅ Accordée"
-            : "❌ Non accordée"}
-        </Text>
-        <Text style={styles.statusText}>
-          Audio:{" "}
-          {permissionsStatus.audio?.granted ? "✅ Accordée" : "❌ Non accordée"}
-        </Text>
-        <Text style={styles.statusText}>
-          Localisation:{" "}
-          {permissionsStatus.location?.granted
-            ? "✅ Accordée"
-            : "❌ Non accordée"}
-        </Text>
-        <Text style={styles.statusText}>
-          Stockage:{" "}
-          {permissionsStatus.storage?.granted
-            ? "✅ Accordée"
-            : "❌ Non accordée"}
-        </Text>
-        <Text style={styles.statusText}>
-          Appels:{" "}
-          {permissionsStatus.phoneCall?.granted
-            ? "✅ Accordée"
-            : "❌ Non accordée"}
-        </Text>
+
+      <View style={styles.permissionsContainer}>
+        {/* Permission Caméra */}
+        <View style={styles.permissionItem}>
+          <Ionicons
+            name="camera"
+            size={24}
+            color={
+              permissionsStatus.camera?.granted ? Colors.success : Colors.error
+            }
+            style={styles.icon}
+          />
+          <View style={styles.permissionTextContainer}>
+            <Text style={styles.permissionTitle}>Caméra</Text>
+            <Text style={styles.permissionDescription}>
+              Nécessaire pour prendre des photos et des vidéos.
+            </Text>
+          </View>
+          <Button
+            title={permissionsStatus.camera?.granted ? "Granted" : "Allow"}
+            onPress={() => requestPermission("camera", requestCameraPermission)}
+            loading={loadingStates.camera}
+            style={[
+              styles.permissionButton,
+              permissionsStatus.camera?.granted && styles.buttonGranted,
+            ]}
+            disabled={permissionsStatus.camera?.granted}
+          />
+        </View>
+
+        {/* Permission Audio */}
+        <View style={styles.permissionItem}>
+          <Ionicons
+            name="mic"
+            size={24}
+            color={
+              permissionsStatus.audio?.granted ? Colors.success : Colors.error
+            }
+            style={styles.icon}
+          />
+          <View style={styles.permissionTextContainer}>
+            <Text style={styles.permissionTitle}>Audio</Text>
+            <Text style={styles.permissionDescription}>
+              Nécessaire pour enregistrer du son ou passer des appels.
+            </Text>
+          </View>
+          <Button
+            title={permissionsStatus.audio?.granted ? "Granted" : "Allow"}
+            onPress={() => requestPermission("audio", requestAudioPermission)}
+            loading={loadingStates.audio}
+            style={[
+              styles.permissionButton,
+              permissionsStatus.audio?.granted && styles.buttonGranted,
+            ]}
+            disabled={permissionsStatus.audio?.granted}
+          />
+        </View>
+
+        {/* Permission Localisation */}
+        <View style={styles.permissionItem}>
+          <Ionicons
+            name="location"
+            size={24}
+            color={
+              permissionsStatus.location?.granted
+                ? Colors.success
+                : Colors.error
+            }
+            style={styles.icon}
+          />
+          <View style={styles.permissionTextContainer}>
+            <Text style={styles.permissionTitle}>Localisation</Text>
+            <Text style={styles.permissionDescription}>
+              Nécessaire pour fournir des services basés sur votre position.
+            </Text>
+          </View>
+          <Button
+            title={permissionsStatus.location?.granted ? "Granted" : "Allow"}
+            onPress={() =>
+              requestPermission("location", requestLocationPermission)
+            }
+            loading={loadingStates.location}
+            style={[
+              styles.permissionButton,
+              permissionsStatus.location?.granted && styles.buttonGranted,
+            ]}
+            disabled={permissionsStatus.location?.granted}
+          />
+        </View>
+
+        {/* Permission Stockage */}
+        <View style={styles.permissionItem}>
+          <Ionicons
+            name="folder"
+            size={24}
+            color={
+              permissionsStatus.storage?.granted ? Colors.success : Colors.error
+            }
+            style={styles.icon}
+          />
+          <View style={styles.permissionTextContainer}>
+            <Text style={styles.permissionTitle}>Stockage</Text>
+            <Text style={styles.permissionDescription}>
+              Nécessaire pour accéder à vos photos et fichiers.
+            </Text>
+          </View>
+          <Button
+            title={permissionsStatus.storage?.granted ? "Granted" : "Allow"}
+            onPress={() =>
+              requestPermission("storage", requestStoragePermission)
+            }
+            loading={loadingStates.storage}
+            style={[
+              styles.permissionButton,
+              permissionsStatus.storage?.granted && styles.buttonGranted,
+            ]}
+            disabled={permissionsStatus.storage?.granted}
+          />
+        </View>
+
+        {/* Permission Appels */}
+        <View style={styles.permissionItem}>
+          <Ionicons
+            name="call"
+            size={24}
+            color={
+              permissionsStatus.phoneCall?.granted
+                ? Colors.success
+                : Colors.error
+            }
+            style={styles.icon}
+          />
+          <View style={styles.permissionTextContainer}>
+            <Text style={styles.permissionTitle}>Appels</Text>
+            <Text style={styles.permissionDescription}>
+              Nécessaire pour gérer les appels téléphoniques (Android
+              uniquement).
+            </Text>
+          </View>
+          <Button
+            title={permissionsStatus.phoneCall?.granted ? "Granted" : "Allow"}
+            onPress={() =>
+              requestPermission("phoneCall", requestPhoneCallPermission)
+            }
+            loading={loadingStates.phoneCall}
+            style={[
+              styles.permissionButton,
+              permissionsStatus.phoneCall?.granted && styles.buttonGranted,
+            ]}
+            disabled={permissionsStatus.phoneCall?.granted}
+          />
+        </View>
       </View>
+
       <Button
-        title="Demander les permissions"
-        loading={loading}
-        onPress={requestMissingPermissions}
-        style={styles.button}
+        title="Continuer"
+        // onPress={() => router.replace("/home")}
+        style={[
+          styles.continueButton,
+          !allPermissionsGranted && styles.buttonDisabled,
+        ]}
+        disabled={!allPermissionsGranted}
       />
-    </View>
+    </ScrollView>
   );
 }
 
@@ -182,15 +304,16 @@ const createStyles = (Colors, Fonts, Styles) =>
     container: {
       flex: 1,
       backgroundColor: Colors.background,
-      paddingTop: Platform.OS === "android" ? StatusBar.currentHeight + 10 : 50,
+      paddingTop: Platform.OS === "android" ? StatusBar.currentHeight + 20 : 60,
+    },
+    contentContainer: {
       paddingHorizontal: Styles.padding.sm,
-      justifyContent: "center",
-      alignItems: "center",
+      paddingBottom: Styles.padding.xl,
     },
     title: {
       color: Colors.bw,
-      fontSize: Fonts.sizes.xl,
-      fontFamily: Fonts.family.FredokaRegular,
+      fontSize: Fonts.sizes.xxl,
+      fontFamily: Fonts.family.FredokaMedium,
       textAlign: "center",
       marginTop: Styles.margin.xl,
       marginBottom: Styles.margin.sm,
@@ -201,19 +324,54 @@ const createStyles = (Colors, Fonts, Styles) =>
       fontSize: Fonts.sizes.md,
       fontFamily: Fonts.family.FredokaRegular,
       textAlign: "center",
-      marginBottom: Styles.margin.lg,
+      marginBottom: Styles.margin.xxl,
     },
-    statusContainer: {
+    permissionsContainer: {
       marginVertical: Styles.margin.lg,
-      alignItems: "flex-start",
     },
-    statusText: {
+    permissionItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: Colors.background + "10",
+      borderRadius: Styles.borderRadius.xl,
+      padding: Styles.padding.md,
+      marginBottom: Styles.margin.md,
+      elevation: 1,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.2,
+      shadowRadius: 2,
+    },
+    icon: {
+      marginRight: Styles.margin.md,
+    },
+    permissionTextContainer: {
+      flex: 1,
+    },
+    permissionTitle: {
       color: Colors.bw,
-      fontSize: Fonts.sizes.md,
-      fontFamily: Fonts.family.FredokaRegular,
-      marginBottom: Styles.margin.sm,
+      fontSize: Fonts.sizes.lg,
+      fontFamily: Fonts.family.FredokaMedium,
     },
-    button: {
+    permissionDescription: {
+      color: Colors.bw,
+      opacity: Styles.opacity.xl,
+      fontSize: Fonts.sizes.sm,
+      fontFamily: Fonts.family.FredokaRegular,
+    },
+    permissionButton: {
+      backgroundColor: Colors.primaryBlue,
+      borderRadius: Styles.borderRadius.lg,
+      height: Styles.size.md,
+      paddingHorizontal: Styles.padding.md,
+      minWidth: 100,
+      minHeight: 40,
+    },
+    buttonGranted: {
+      backgroundColor: Colors.success,
+      opacity: 0.7,
+    },
+    continueButton: {
       backgroundColor: Colors.primaryBlue,
       borderRadius: Styles.borderRadius.xxxl,
       height: Styles.size.xlg,
@@ -225,5 +383,9 @@ const createStyles = (Colors, Fonts, Styles) =>
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.23,
       shadowRadius: 2.62,
+    },
+    buttonDisabled: {
+      backgroundColor: Colors.bw + "40",
+      opacity: 0.5,
     },
   });

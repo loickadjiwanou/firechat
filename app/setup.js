@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from "react";
+import React, { useMemo } from "react";
 import {
   View,
   Text,
@@ -6,24 +6,55 @@ import {
   Platform,
   ScrollView,
   TextInput,
-  Pressable,
   TouchableOpacity,
 } from "react-native";
 import { useTheme } from "../hooks/useTheme";
 import { useToast } from "../hooks/useToast";
-import { router, useRouter } from "expo-router";
+import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import FluidTabInteraction from "../components/FluidTabInteraction";
 import Button from "../components/Button";
 import { isValidEmail } from "../utils/validators";
-import { Feather } from "@expo/vector-icons";
+import { Feather, FontAwesome, Ionicons } from "@expo/vector-icons";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   updateProfile,
-  onAuthStateChanged,
 } from "firebase/auth";
 import { auth } from "../configs/firebaseConfig";
+
+const OthersMethods = ({ from }) => {
+  const { Colors, Fonts, Styles } = useTheme();
+  const styles = createStyles(Colors, Fonts, Styles);
+
+  const handleOtherMethodPress = (from) => {
+    console.log("from: ", from);
+  };
+
+  return (
+    <View style={styles.othersMethodsContainer}>
+      <TouchableOpacity
+        style={styles.othersMethod}
+        hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
+        activeOpacity={0.8}
+        onPress={() => handleOtherMethodPress(from)}
+      >
+        <Ionicons name="logo-google" size={24} color={Colors.bw} />
+        <Text style={styles.othersMethodText}>Google</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.othersMethod}
+        hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
+        activeOpacity={0.8}
+        onPress={() => handleOtherMethodPress(from)}
+      >
+        <FontAwesome name="apple" size={25} color={Colors.bw} />
+        <Text style={styles.othersMethodText}>Apple</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
 
 const LoginForm = React.memo(({ onSubmit }) => {
   const [email, setEmail] = React.useState("");
@@ -84,6 +115,12 @@ const LoginForm = React.memo(({ onSubmit }) => {
         onPress={() => onSubmit({ email, password, setLoading })}
         style={styles.button}
       />
+
+      <View style={styles.orLine}>
+        <Text style={styles.orText}>or continue with</Text>
+      </View>
+
+      <OthersMethods from="login" />
     </View>
   );
 });
@@ -178,12 +215,17 @@ const RegisterForm = React.memo(({ onSubmit }) => {
         }
         style={styles.button}
       />
+
+      <View style={styles.orLine}>
+        <Text style={styles.orText}>or continue with</Text>
+      </View>
+
+      <OthersMethods from="register" />
     </View>
   );
 });
 
 export default function Setup() {
-  const router = useRouter();
   const { Colors, Fonts, Styles } = useTheme();
   const {
     loginSuccessToast,
@@ -194,16 +236,6 @@ export default function Setup() {
     passwordsDontMatchToast,
   } = useToast();
   const styles = createStyles(Colors, Fonts, Styles);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        console.log("User is logged in:", user.email);
-        router.push("/permissions");
-      }
-    });
-    return () => unsubscribe();
-  }, []);
 
   const handleLogin = async ({ email, password, setLoading }) => {
     if (!email || !password) {
@@ -226,7 +258,7 @@ export default function Setup() {
       const user = userCredential.user;
       console.log("User logged in:", user.email);
       loginSuccessToast(user.email);
-      router.push("/permissions");
+      router.replace("/permissions");
     } catch (error) {
       console.log("Login error:", error);
       loginErrorToast(error.code);
@@ -268,7 +300,7 @@ export default function Setup() {
       await updateProfile(user, { displayName: fullName });
       console.log("User registered:", user.email);
       registerSuccessToast(user.email);
-      router.push("/permissions");
+      router.replace("/permissions");
     } catch (error) {
       console.log("Registration error:", error);
       registerErrorToast(error.code);
@@ -276,6 +308,8 @@ export default function Setup() {
       setLoading(false);
     }
   };
+
+  const [selectedTab, setSelectedTab] = React.useState("login");
 
   const tabs = useMemo(
     () => [
@@ -300,14 +334,29 @@ export default function Setup() {
       contentContainerStyle={{ flexGrow: 1 }}
       showsVerticalScrollIndicator={false}
     >
-      <Text style={styles.title}>Get Started and Connect{"\n"}Instantly</Text>
-      <Text style={styles.description}>Sign in to your Account</Text>
+      {selectedTab === "login" ? (
+        <>
+          <Text style={styles.title}>
+            Get Started and Connect{"\n"}Instantly
+          </Text>
+          <Text style={styles.description}>Sign in to your Account</Text>
+        </>
+      ) : (
+        <>
+          <Text style={styles.title}>
+            Create an Account{"\n"}and Get Started
+          </Text>
+          <Text style={styles.description}>
+            Already have an account? Log in
+          </Text>
+        </>
+      )}
       <FluidTabInteraction
         tabs={tabs}
         defaultTabId="login"
         width={375}
         height={50}
-        onTabChange={(tab) => console.log(`Selected tab: ${tab.name}`)}
+        onTabChange={(tab) => setSelectedTab(tab.id)}
         contentStyle={{ backgroundColor: Colors.background }}
       />
     </ScrollView>
@@ -392,6 +441,42 @@ const createStyles = (Colors, Fonts, Styles) =>
       fontFamily: Fonts.family.FredokaRegular,
       fontSize: Fonts.sizes.md,
       color: Colors.primaryBlue,
-      opacity: Styles.opacity.xlg,
+    },
+    orLine: {
+      height: 1,
+      backgroundColor: Colors.bw + "20",
+      marginTop: Styles.margin.xlg,
+    },
+    orText: {
+      position: "absolute",
+      backgroundColor: Colors.background,
+      fontFamily: Fonts.family.FredokaRegular,
+      fontSize: Fonts.sizes.md,
+      color: Colors.gray,
+      textAlign: "center",
+      alignSelf: "center",
+      top: -11,
+      paddingHorizontal: Styles.padding.md,
+    },
+    othersMethodsContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginVertical: 50,
+    },
+    othersMethod: {
+      width: "48%",
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      justifyContent: "center",
+      borderWidth: 1.5,
+      borderColor: Colors.bw + "20",
+      borderRadius: Styles.borderRadius.xxxl,
+      height: Styles.size.xlg,
+    },
+    othersMethodText: {
+      fontFamily: Fonts.family.FredokaRegular,
+      fontSize: Fonts.sizes.md,
+      color: Colors.bw,
     },
   });

@@ -26,7 +26,6 @@ export default function RootLayout() {
   });
   const [authChecked, setAuthChecked] = useState(false);
   const router = useRouter();
-  const { Colors } = useTheme();
 
   useEffect(() => {
     async function prepare() {
@@ -44,7 +43,7 @@ export default function RootLayout() {
       setAuthChecked(true);
       if (user) {
         console.log("User is logged in:", user.email);
-        router.replace("/permissions"); // Redirige vers /permissions après connexion
+        router.replace("/permissions");
       }
     });
     return () => unsubscribe();
