@@ -26,6 +26,7 @@ export default function RootLayout() {
   });
   const [authChecked, setAuthChecked] = useState(false);
   const router = useRouter();
+  const { Colors } = useTheme();
 
   useEffect(() => {
     async function prepare() {
@@ -42,8 +43,8 @@ export default function RootLayout() {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setAuthChecked(true);
       if (user) {
-        // console.log("User is logged in:", user.email);
-        router.replace("/home");
+        console.log("User is logged in:", user.email);
+        router.replace("/permissions"); // Redirige vers /permissions après connexion
       }
     });
     return () => unsubscribe();
@@ -66,6 +67,7 @@ export default function RootLayout() {
         <Stack.Screen name="onboarding" options={{ headerShown: false }} />
         <Stack.Screen name="setup" options={{ headerShown: false }} />
         <Stack.Screen name="forgotpassword" options={{ headerShown: false }} />
+        <Stack.Screen name="permissions" options={{ headerShown: false }} />
         <Stack.Screen name="home" options={{ headerShown: false }} />
       </Stack>
       <ToastManager

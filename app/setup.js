@@ -199,7 +199,7 @@ export default function Setup() {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         console.log("User is logged in:", user.email);
-        router.push("/home");
+        router.push("/permissions");
       }
     });
     return () => unsubscribe();
@@ -226,7 +226,7 @@ export default function Setup() {
       const user = userCredential.user;
       console.log("User logged in:", user.email);
       loginSuccessToast(user.email);
-      router.push("/home");
+      router.push("/permissions");
     } catch (error) {
       console.log("Login error:", error);
       loginErrorToast(error.code);
@@ -268,7 +268,7 @@ export default function Setup() {
       await updateProfile(user, { displayName: fullName });
       console.log("User registered:", user.email);
       registerSuccessToast(user.email);
-      router.push("/home");
+      router.push("/permissions");
     } catch (error) {
       console.log("Registration error:", error);
       registerErrorToast(error.code);
