@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,9 +6,9 @@ import {
   Platform,
   ScrollView,
   TextInput,
-  Alert,
 } from "react-native";
 import { useTheme } from "../hooks/useTheme";
+import { useToast } from "../hooks/useToast";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import FluidTabInteraction from "../components/FluidTabInteraction";
@@ -19,9 +19,9 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   updateProfile,
+  onAuthStateChanged,
 } from "firebase/auth";
 import { auth } from "../configs/firebaseConfig";
-import { useToast } from "../hooks/useToast";
 
 const LoginForm = React.memo(({ onSubmit }) => {
   const [email, setEmail] = React.useState("");
@@ -174,25 +174,34 @@ const RegisterForm = React.memo(({ onSubmit }) => {
 export default function Setup() {
   const router = useRouter();
   const { Colors, Fonts, Styles } = useTheme();
+  const {
+    loginSuccessToast,
+    loginErrorToast,
+    registerSuccessToast,
+    registerErrorToast,
+    missingFieldsToast,
+    passwordsDontMatchToast,
+  } = useToast();
   const styles = createStyles(Colors, Fonts, Styles);
-  const { showToast } = useToast();
 
-  const handleLogin = () => {
-    showToast({
-      type: "success",
-      message: "Login successful",
-      theme: "dark",
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        console.log("User is logged in:", user.email);
+        router.push("/home");
+      }
     });
-  };
+    return () => unsubscribe();
+  }, []);
 
-  const handleLogin2 = async ({ email, password, setLoading }) => {
+  const handleLogin = async ({ email, password, setLoading }) => {
     if (!email || !password) {
-      Alert.alert("Error", "Please fill in all fields.");
+      missingFieldsToast();
       return;
     }
 
     if (!isValidEmail(email)) {
-      Alert.alert("Error", "Please enter a valid email address.");
+      loginErrorToast("auth/invalid-email");
       return;
     }
 
@@ -205,28 +214,11 @@ export default function Setup() {
       );
       const user = userCredential.user;
       console.log("User logged in:", user.email);
-      Alert.alert("Success", `Welcome, ${user.email}!`);
-      router.push("/home"); // Redirect to home screen
+      loginSuccessToast(user.email);
+      router.push("/home");
     } catch (error) {
-      console.error("Login error:", error);
-      let message = "Error during login";
-      switch (error.code) {
-        case "auth/user-not-found":
-          message = "User not found";
-          break;
-        case "auth/wrong-password":
-          message = "Incorrect password";
-          break;
-        case "auth/invalid-email":
-          message = "Invalid email address";
-          break;
-        case "auth/too-many-requests":
-          message = "Too many attempts, please try again later";
-          break;
-        default:
-          message = error.message;
-      }
-      Alert.alert("Error", message);
+      console.log("Login error:", error);
+      loginErrorToast(error.code);
     } finally {
       setLoading(false);
     }
@@ -240,17 +232,17 @@ export default function Setup() {
     setLoading,
   }) => {
     if (!fullName || !email || !password || !confirmPassword) {
-      Alert.alert("Error", "Please fill in all fields.");
+      missingFieldsToast();
       return;
     }
 
     if (!isValidEmail(email)) {
-      Alert.alert("Error", "Please enter a valid email address.");
+      registerErrorToast("auth/invalid-email");
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert("Error", "Passwords do not match.");
+      passwordsDontMatchToast();
       return;
     }
 
@@ -264,25 +256,11 @@ export default function Setup() {
       const user = userCredential.user;
       await updateProfile(user, { displayName: fullName });
       console.log("User registered:", user.email);
-      Alert.alert("Success", `Account created for ${user.email}!`);
-      router.push("/home"); // Redirect to home screen
+      registerSuccessToast(user.email);
+      router.push("/home");
     } catch (error) {
-      console.error("Registration error:", error);
-      let message = "Error during registration";
-      switch (error.code) {
-        case "auth/email-already-in-use":
-          message = "This email is already in use";
-          break;
-        case "auth/weak-password":
-          message = "Password is too weak (minimum 6 characters)";
-          break;
-        case "auth/invalid-email":
-          message = "Invalid email address";
-          break;
-        default:
-          message = error.message;
-      }
-      Alert.alert("Error", message);
+      console.log("Registration error:", error);
+      registerErrorToast(error.code);
     } finally {
       setLoading(false);
     }
@@ -393,6 +371,6 @@ const createStyles = (Colors, Fonts, Styles) =>
     eyeIcon: {
       position: "absolute",
       right: 15,
-      top: 40,
+      top: 36,
     },
   });

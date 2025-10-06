@@ -20,6 +20,11 @@ export const Colors = {
     baseGray80: "#30302E",
     highlightLabel: "#312F2D",
     baseLabel: "#9B9893",
+    success: "#4CAF50",
+    error: "#F44336",
+    info: "#2196F3",
+    warning: "#FF9800",
+    backgroundtoast: "#333",
   },
   dark: {
     black: "#000000",
@@ -40,6 +45,11 @@ export const Colors = {
     baseGray80: "#30302E",
     highlightLabel: "#312F2D",
     baseLabel: "#9B9893",
+    success: "#4CAF50",
+    error: "#F44336",
+    info: "#2196F3",
+    warning: "#FF9800",
+    backgroundtoast: "#333",
   },
 };
 
