@@ -65,8 +65,11 @@ const PressableScale = ({ children, onPress, style }) => {
 
 // TabBarItem Component
 const TabBarItem = React.memo(({ onPress, screenName, focused }) => {
-  console.log("focused", focused);
   const { Colors } = useTheme();
+
+  const iconStyle = useAnimatedStyle(() => ({
+    marginTop: interpolate(IsTabBarActive.value ? 1 : 0, [0, 1], [0, 25]),
+  }));
 
   const getIconByScreenName = useCallback(
     (pageName) => {
@@ -81,14 +84,15 @@ const TabBarItem = React.memo(({ onPress, screenName, focused }) => {
       if (!icon) return null;
 
       return (
-        <Ionicons
-          {...icon}
-          color={focused ? Colors.primaryBlue : Colors.gray + "80"}
-          style={{ marginTop: 0 }}
-        />
+        <Animated.View style={iconStyle}>
+          <Ionicons
+            {...icon}
+            color={focused ? Colors.primaryBlue : Colors.gray + "80"}
+          />
+        </Animated.View>
       );
     },
-    [Colors.primaryBlue, Colors.bw, focused]
+    [Colors.primaryBlue, Colors.gray, focused]
   );
 
   return (

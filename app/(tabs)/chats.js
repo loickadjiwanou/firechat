@@ -1,25 +1,16 @@
 import React from "react";
-import { View, Text, StyleSheet, useWindowDimensions } from "react-native";
+import { View, Text, StyleSheet, Platform, ScrollView } from "react-native";
 import Animated, { useAnimatedScrollHandler } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "../../hooks/useTheme";
 import { IsTabBarActive } from "../../components/DynamicBottomTab";
+import UserBar from "../../components/UserBar";
+import { StatusBar } from "expo-status-bar";
 
-const generateDummyData = () => {
-  return Array(100)
-    .fill(null)
-    .map((_, index) => ({
-      id: index,
-      title: `Item ${index + 1}`,
-      color: `hsl(${Math.random() * 360}, 70%, 60%)`,
-    }));
-};
+const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
 export default function ChatsScreen() {
-  const { Colors } = useTheme();
-  const { top: safeTop } = useSafeAreaInsets();
-  const { width } = useWindowDimensions();
-  const data = generateDummyData();
+  const { Colors, Styles, Fonts } = useTheme();
+  const styles = createStyles(Colors, Fonts, Styles);
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
@@ -27,50 +18,55 @@ export default function ChatsScreen() {
     },
   });
 
-  const renderItem = ({ item }) => (
-    <View
-      style={[
-        styles.card,
-        {
-          backgroundColor: item.color,
-          width: (width - 24 * 3) / 2,
-        },
-      ]}
-    >
-      <Text style={[styles.cardText, { color: Colors.bw }]}>{item.title}</Text>
-    </View>
-  );
-
   return (
-    <Animated.FlatList
-      data={data}
-      renderItem={renderItem}
-      keyExtractor={(item) => item.id.toString()}
-      numColumns={2}
-      onScroll={scrollHandler}
-      scrollEventThrottle={16}
-      contentContainerStyle={{
-        padding: 12,
-        paddingTop: safeTop + 12,
-        backgroundColor: Colors.background,
-      }}
-      style={{ flex: 1, backgroundColor: Colors.background }}
-    />
+    <View style={styles.container}>
+      <StatusBar style="auto" />
+      <AnimatedScrollView
+        showsVerticalScrollIndicator={false}
+        onScroll={scrollHandler}
+        scrollEventThrottle={16}
+        overScrollMode="never"
+        contentContainerStyle={{
+          flexGrow: 1,
+          backgroundColor: Colors.background,
+        }}
+        style={{ flex: 1, backgroundColor: Colors.background }}
+      >
+        <UserBar
+          from="chats"
+          backgroundColor={Colors.background}
+          backArrow={false}
+          searchIcon={true}
+          moreIcon={true}
+        />
+        <View style={styles.placeholder}>
+          <Text style={styles.placeholderText}>
+            Chats content coming soon...
+          </Text>
+        </View>
+      </AnimatedScrollView>
+    </View>
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    margin: 12,
-    padding: 16,
-    borderRadius: 8,
-    justifyContent: "center",
-    alignItems: "center",
-    height: 120,
-  },
-  cardText: {
-    fontSize: 16,
-    fontFamily: "FredokaMedium",
-    textAlign: "center",
-  },
-});
+const createStyles = (Colors, Fonts, Styles) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: Colors.background,
+      paddingTop: Platform.OS === "android" ? StatusBar.currentHeight + 10 : 50,
+      paddingHorizontal: Styles.padding.sm,
+    },
+    placeholder: {
+      flex: 1,
+      height: 1000, // Ensure enough height to trigger scrolling
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    placeholderText: {
+      fontSize: 16,
+      fontFamily: Fonts.FredokaMedium,
+      color: Colors.gray,
+      textAlign: "center",
+    },
+  });

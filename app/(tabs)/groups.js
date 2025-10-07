@@ -49,6 +49,7 @@ export default function GroupsScreen() {
       numColumns={2}
       onScroll={scrollHandler}
       scrollEventThrottle={16}
+      showsVerticalScrollIndicator={false}
       contentContainerStyle={{
         padding: 12,
         paddingTop: safeTop + 12,
