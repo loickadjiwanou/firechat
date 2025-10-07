@@ -3,6 +3,7 @@ import { StatusBar } from "expo-status-bar";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { Stack, useRouter } from "expo-router";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import ToastManager from "toastify-react-native";
 
 import { useTheme } from "../hooks/useTheme";
@@ -32,22 +33,19 @@ export default function RootLayout() {
   });
 
   const onReady = useCallback(async () => {
-    if ((fontsLoaded || fontsError) && authChecked) {
+    if ((fontsLoaded || fontsError) && authChecked && !hasRedirected.current) {
       await SplashScreen.hideAsync();
+      hasRedirected.current = true;
 
-      if (!hasRedirected.current) {
-        hasRedirected.current = true;
-
-        if (user) {
-          console.log("✅ User is logged in:", user.email);
-          router.replace("/home");
-        } else {
-          console.log("🚪 User is not logged in");
-          router.replace("/");
-        }
+      if (user) {
+        console.log("✅ User is logged in:", user.email);
+        router.replace("(tabs)/chats");
+      } else {
+        console.log("🚪 User is not logged in");
+        router.replace("/");
       }
     }
-  }, [fontsLoaded, fontsError, authChecked, user]);
+  }, [fontsLoaded, fontsError, authChecked, user, router]);
 
   useEffect(() => {
     onReady();
@@ -57,14 +55,32 @@ export default function RootLayout() {
   if (!authChecked) return null;
 
   return (
-    <>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="index" />
-        <Stack.Screen name="onboarding" />
-        <Stack.Screen name="setup" />
-        <Stack.Screen name="forgotpassword" />
-        <Stack.Screen name="permissions" />
-        <Stack.Screen name="home" />
+        <Stack.Screen
+          name="index"
+          options={{ gestureEnabled: false, headerBackVisible: false }}
+        />
+        <Stack.Screen
+          name="onboarding"
+          options={{ gestureEnabled: false, headerBackVisible: false }}
+        />
+        <Stack.Screen
+          name="setup"
+          options={{ gestureEnabled: false, headerBackVisible: false }}
+        />
+        <Stack.Screen
+          name="forgotpassword"
+          options={{ gestureEnabled: false, headerBackVisible: false }}
+        />
+        <Stack.Screen
+          name="permissions"
+          options={{ gestureEnabled: true, headerBackVisible: true }}
+        />
+        <Stack.Screen
+          name="(tabs)"
+          options={{ gestureEnabled: false, headerBackVisible: false }}
+        />
       </Stack>
 
       <ToastManager
@@ -81,6 +97,6 @@ export default function RootLayout() {
         useModal={false}
       />
       <ThemedStatusBar />
-    </>
+    </GestureHandlerRootView>
   );
 }

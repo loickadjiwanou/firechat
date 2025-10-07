@@ -36,32 +36,31 @@ export default function PermissionsScreen() {
   });
   const styles = createStyles(Colors, Fonts, Styles);
 
+  const checkAndRedirect = async () => {
+    const permissions = await checkAllPermissions();
+    setPermissionsStatus(permissions);
+
+    if (
+      permissions.camera?.granted &&
+      permissions.audio?.granted &&
+      permissions.location?.granted &&
+      permissions.storage?.granted &&
+      permissions.phoneCall?.granted
+    ) {
+      setLoadingStates((prev) => ({ ...prev, continue: true }));
+      showToast({
+        type: "success",
+        message: "All permissions granted",
+        subMessage: "",
+      });
+      setTimeout(() => {
+        router.replace("(tabs)/chats");
+      }, 2000);
+    }
+  };
+
   useEffect(() => {
-    const checkPermissions = async () => {
-      const permissions = await checkAllPermissions();
-      // console.log("Permissions status:", permissions);
-      setPermissionsStatus(permissions);
-
-      if (
-        permissions.camera?.granted &&
-        permissions.audio?.granted &&
-        permissions.location?.granted &&
-        permissions.storage?.granted &&
-        permissions.phoneCall?.granted
-      ) {
-        showToast({
-          type: "success",
-          message: "All permissions granted",
-          subMessage: "",
-        });
-        setLoadingStates((prev) => ({ ...prev, continue: true }));
-        setTimeout(() => {
-          router.replace("/home");
-        }, 1000);
-      }
-    };
-
-    checkPermissions();
+    checkAndRedirect();
   }, []);
 
   const requestPermission = async (permissionType, requestFn) => {
@@ -73,37 +72,18 @@ export default function PermissionsScreen() {
         message: result.granted
           ? `${
               permissionType.charAt(0).toUpperCase() + permissionType.slice(1)
-            } granted.`
+            } granted`
           : `${
               permissionType.charAt(0).toUpperCase() + permissionType.slice(1)
-            } denied.`,
+            } denied`,
         subMessage: result.error || "",
       });
 
-      const updatedPermissions = await checkAllPermissions();
-      setPermissionsStatus(updatedPermissions);
-
-      if (
-        updatedPermissions.camera?.granted &&
-        updatedPermissions.audio?.granted &&
-        updatedPermissions.location?.granted &&
-        updatedPermissions.storage?.granted &&
-        updatedPermissions.phoneCall?.granted
-      ) {
-        showToast({
-          type: "success",
-          message: "All permissions granted",
-          subMessage: "",
-        });
-        setLoadingStates((prev) => ({ ...prev, continue: true }));
-        setTimeout(() => {
-          router.replace("/home");
-        }, 1000);
-      }
+      await checkAndRedirect();
     } catch (error) {
       showToast({
         type: "error",
-        message: `Erreur ${permissionType}`,
+        message: `Error requesting ${permissionType}`,
         subMessage: error.message,
       });
     } finally {
@@ -113,8 +93,13 @@ export default function PermissionsScreen() {
 
   const handleContinue = () => {
     setLoadingStates((prev) => ({ ...prev, continue: true }));
+    showToast({
+      type: "success",
+      message: "All permissions granted",
+      subMessage: "",
+    });
     setTimeout(() => {
-      router.replace("/home");
+      router.replace("(tabs)/chats");
     }, 2000);
   };
 
@@ -379,7 +364,7 @@ const createStyles = (Colors, Fonts, Styles) =>
       alignItems: "center",
       marginTop: Styles.margin.xl,
       elevation: 2,
-      shadowColor: Colors.black,
+      shadowColor: "#000",
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.23,
       shadowRadius: 2.62,

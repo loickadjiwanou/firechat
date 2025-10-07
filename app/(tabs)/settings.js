@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Platform } from "react-native";
 import { signOut, onAuthStateChanged } from "firebase/auth";
-import { auth } from "../configs/firebaseConfig";
+import { auth } from "../../configs/firebaseConfig";
 import { useRouter } from "expo-router";
-import { useTheme } from "../hooks/useTheme";
-import { useToast } from "../hooks/useToast";
-import Button from "../components/Button";
+import { useTheme } from "../../hooks/useTheme";
+import { useToast } from "../../hooks/useToast";
+import Button from "../../components/Button";
 import { StatusBar } from "expo-status-bar";
 
-export default function Home() {
+export default function SettingsScreen() {
   const router = useRouter();
   const { Colors, Fonts, Styles } = useTheme();
   const { infoToast } = useToast();

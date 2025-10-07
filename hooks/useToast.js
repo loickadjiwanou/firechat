@@ -9,7 +9,7 @@ export const useToast = () => {
     message = "No message", // Main message (string)
     subMessage = "", // Secondary message (string)
     position = "bottom", // 'top' | 'center' | 'bottom'
-    visibilityTime = 4000, // Duration in ms before auto-hide
+    visibilityTime = 3000, // Duration in ms before auto-hide
     autoHide = true, // Whether the toast should disappear automatically
     onPress, // Callback when toast is pressed
     onShow, // Callback when toast is shown
@@ -201,11 +201,12 @@ export const useToast = () => {
     });
   };
 
-  const infoToast = (message, subMessage = "") => {
+  const infoToast = (message, subMessage = "", visibilityTime) => {
     showToast({
       type: "info",
       message,
       subMessage,
+      visibilityTime: visibilityTime || 4000,
       theme: theme,
     });
   };
