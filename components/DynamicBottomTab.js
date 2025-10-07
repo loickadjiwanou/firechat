@@ -13,9 +13,10 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import { Ionicons, Lucide } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { makeMutable } from "react-native-reanimated";
 import { useTheme } from "../hooks/useTheme";
+import { useRouter, usePathname } from "expo-router";
 
 // Constants
 const BOTTOM_BAR_HEIGHT = 70;
@@ -23,26 +24,14 @@ const LINEAR_GRADIENT_HEIGHT = 100;
 const LINEAR_GRADIENT_COLORS = [
   "rgba(255,255,255,0)",
   "rgba(0,0,0,0.1)",
-  "rgba(0,0,0,0.5)",
-  "rgba(0,0,0,0.8)",
+  "rgba(0,0,0,0.3)",
+  "rgba(0,0,0,0.6)",
 ];
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const IS_SMALL_DEVICE = SCREEN_HEIGHT < 700;
 
 const ScreenNamesArray = ["chats", "groups", "calls", "settings"];
-const ScreenNames = ScreenNamesArray.reduce((acc, name) => {
-  acc[name] = name;
-  return acc;
-}, {});
-
-const screensMap = Object.keys(ScreenNames).reduce(
-  (acc, key, index) => ({
-    ...acc,
-    [index]: key,
-  }),
-  {}
-);
 
 // State
 export const IsTabBarActive = makeMutable(true);
@@ -75,71 +64,59 @@ const PressableScale = ({ children, onPress, style }) => {
 };
 
 // TabBarItem Component
-const TabBarItem = React.memo(
-  ({ onPress, focusedIndex, index, screenName }) => {
-    const { Colors } = useTheme();
-    const isFocused = useDerivedValue(() => focusedIndex.value === index);
+const TabBarItem = React.memo(({ onPress, screenName, focused }) => {
+  console.log("focused", focused);
+  const { Colors } = useTheme();
 
-    const rStyle = useAnimatedStyle(() => ({
-      opacity: withTiming(isFocused.value ? 1 : 0.3),
-    }));
+  const getIconByScreenName = useCallback(
+    (pageName) => {
+      const icons = {
+        chats: { name: "chatbox-ellipses-outline", size: 30 },
+        groups: { name: "grid-outline", size: 24 },
+        calls: { name: "call-outline", size: 25 },
+        settings: { name: "settings-outline", size: 25 },
+      };
 
-    const getIconByScreenName = useCallback(
-      (pageName) => {
-        const icons = {
-          chats: { name: "chatbox-ellipses-outline", size: 30 },
-          groups: { name: "grid-outline", size: 24 },
-          calls: { name: "call-outline", size: 25 },
-          settings: { name: "settings-outline", size: 25 },
-        };
+      const icon = icons[pageName];
+      if (!icon) return null;
 
-        const icon = icons[pageName];
-        if (!icon) return null;
+      return (
+        <Ionicons
+          {...icon}
+          color={focused ? Colors.primaryBlue : Colors.bw + "80"}
+        />
+      );
+    },
+    [Colors.primaryBlue, Colors.bw, focused]
+  );
 
-        return (
-          <Ionicons
-            {...icon}
-            color={isFocused.value ? Colors.primaryBlue : Colors.bw + "80"}
-          />
-        );
-      },
-      [Colors.primaryBlue, Colors.bw]
-    );
-
-    return (
-      <Animated.View style={[styles.fill, rStyle]}>
-        <PressableScale style={styles.fillCenter} onPress={onPress}>
-          {getIconByScreenName(screenName)}
-        </PressableScale>
-      </Animated.View>
-    );
-  }
-);
+  return (
+    <View style={styles.fill}>
+      <PressableScale style={styles.fillCenter} onPress={onPress}>
+        {getIconByScreenName(screenName)}
+      </PressableScale>
+    </View>
+  );
+});
 
 // BottomTabBar Component
 const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
 
-const BottomTabBar = ({ state, navigation }) => {
+const BottomTabBar = ({ state }) => {
   const { Colors } = useTheme();
-  const focusedIndex = useSharedValue(state.index);
-  const currentIndex = state.index;
+  const router = useRouter();
+  const pathname = usePathname();
 
   const onTapIcon = useCallback(
-    (selectedIndex) => {
-      const nextScreen = screensMap[selectedIndex];
-      const isChangingRoute = currentIndex !== selectedIndex;
-      const popsAmount = navigation
-        .getState()
-        .routes.find((item) => item.name === nextScreen)?.state?.index;
-
-      if (!isChangingRoute && popsAmount !== 0 && popsAmount) {
-        navigation.dispatch({ type: "POP", count: popsAmount });
-        return;
-      }
-
-      navigation.navigate(nextScreen);
+    (screenName) => {
+      router.push(`(tabs)/${screenName}`);
     },
-    [currentIndex, navigation]
+    [router]
+  );
+
+  // Determine the active tab index based on the current pathname
+  const currentTab = ScreenNamesArray.findIndex(
+    (name) => pathname === `(tabs)/${name}` || pathname === `/${name}`
   );
 
   const { bottom: safeBottom } = useSafeAreaInsets();
@@ -199,13 +176,13 @@ const BottomTabBar = ({ state, navigation }) => {
       <Animated.View style={[styles.bottomContainer, rBarStyle]}>
         <AnimatedBlurView
           tint="systemMaterialDark"
-          intensity={70}
+          intensity={90}
           style={[
             styles.blurViewStyle,
             Platform.select({
               android: [
                 styles.androidBlurView,
-                { backgroundColor: Colors.background },
+                { backgroundColor: Colors.background + "CC" },
               ],
             }),
             rBlurStyle,
@@ -213,16 +190,12 @@ const BottomTabBar = ({ state, navigation }) => {
         >
           <View style={{ flex: 1 }}>
             <View style={styles.container}>
-              {Object.keys(ScreenNames).map((key, index) => (
+              {ScreenNamesArray.map((key, index) => (
                 <TabBarItem
                   key={key}
                   screenName={key}
-                  focusedIndex={focusedIndex}
-                  index={index}
-                  onPress={() => {
-                    onTapIcon(index);
-                    focusedIndex.value = index;
-                  }}
+                  focused={currentTab === index}
+                  onPress={() => onTapIcon(key)}
                 />
               ))}
             </View>
@@ -259,10 +232,10 @@ const styles = StyleSheet.create({
   },
   blurViewStyle: {
     flex: 1,
-    backgroundColor: "rgba(255,255,255,0.05)",
+    backgroundColor: "rgba(255,255,255,0.2)",
   },
   androidBlurView: {
-    backgroundColor: "#959595",
+    backgroundColor: "#D3D3D3",
   },
   fill: {
     flex: 1,
