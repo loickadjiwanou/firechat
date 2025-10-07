@@ -15,17 +15,6 @@ export default function Home() {
   const [userName, setUserName] = useState("");
   const styles = createStyles(Colors, Fonts, Styles);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUserName(user.displayName || user.email.split("@")[0]);
-      } else {
-        router.push("/");
-      }
-    });
-    return () => unsubscribe();
-  }, []);
-
   const handleSignOut = async () => {
     try {
       await signOut(auth);

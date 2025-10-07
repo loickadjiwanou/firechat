@@ -142,6 +142,7 @@ export const Styles = {
     xl: 20,
     xxl: 24,
     xxxl: 30,
+    xxg: 40,
     xlg: 50,
   },
 };

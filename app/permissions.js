@@ -32,13 +32,14 @@ export default function PermissionsScreen() {
     location: false,
     storage: false,
     phoneCall: false,
+    continue: false,
   });
   const styles = createStyles(Colors, Fonts, Styles);
 
   useEffect(() => {
     const checkPermissions = async () => {
       const permissions = await checkAllPermissions();
-      console.log("Permissions status:", permissions);
+      // console.log("Permissions status:", permissions);
       setPermissionsStatus(permissions);
 
       if (
@@ -51,9 +52,8 @@ export default function PermissionsScreen() {
         showToast({
           type: "success",
           message: "All permissions granted",
-          subMessage: "Redirecting to home...",
+          subMessage: "",
         });
-        // setTimeout(() => router.replace("/home"), 1000);
       }
     };
 
@@ -72,15 +72,13 @@ export default function PermissionsScreen() {
             } granted.`
           : `${
               permissionType.charAt(0).toUpperCase() + permissionType.slice(1)
-            } granted.`,
+            } denied.`,
         subMessage: result.error || "",
       });
 
-      // Mettre à jour l'état des permissions
       const updatedPermissions = await checkAllPermissions();
       setPermissionsStatus(updatedPermissions);
 
-      // Rediriger si toutes les permissions sont accordées
       if (
         updatedPermissions.camera?.granted &&
         updatedPermissions.audio?.granted &&
@@ -91,9 +89,8 @@ export default function PermissionsScreen() {
         showToast({
           type: "success",
           message: "All permissions granted",
-          subMessage: "Redirecting to home...",
+          subMessage: "",
         });
-        // setTimeout(() => router.replace("/home"), 1000);
       }
     } catch (error) {
       showToast({
@@ -106,20 +103,19 @@ export default function PermissionsScreen() {
     }
   };
 
-  if (!permissionsStatus) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Vérification des permissions...</Text>
-      </View>
-    );
-  }
+  const handleContinue = () => {
+    setLoadingStates((prev) => ({ ...prev, continue: true }));
+    setTimeout(() => {
+      router.replace("/home");
+    }, 2000);
+  };
 
   const allPermissionsGranted =
-    permissionsStatus.camera?.granted &&
-    permissionsStatus.audio?.granted &&
-    permissionsStatus.location?.granted &&
-    permissionsStatus.storage?.granted &&
-    permissionsStatus.phoneCall?.granted;
+    permissionsStatus?.camera?.granted &&
+    permissionsStatus?.audio?.granted &&
+    permissionsStatus?.location?.granted &&
+    permissionsStatus?.storage?.granted &&
+    permissionsStatus?.phoneCall?.granted;
 
   return (
     <ScrollView
@@ -127,168 +123,164 @@ export default function PermissionsScreen() {
       contentContainerStyle={styles.contentContainer}
       showsVerticalScrollIndicator={false}
     >
-      <Text style={styles.title}>Autorisations Requises</Text>
+      <Text style={styles.title}>Required Authorizations</Text>
       <Text style={styles.subtitle}>
-        Nous avons besoin de ces permissions pour offrir la meilleure expérience
-        possible.
+        We need these permissions to provide the best possible experience.
       </Text>
 
       <View style={styles.permissionsContainer}>
-        {/* Permission Caméra */}
         <View style={styles.permissionItem}>
           <Ionicons
             name="camera"
             size={24}
             color={
-              permissionsStatus.camera?.granted ? Colors.success : Colors.error
+              permissionsStatus?.camera?.granted ? Colors.success : Colors.error
             }
             style={styles.icon}
           />
           <View style={styles.permissionTextContainer}>
-            <Text style={styles.permissionTitle}>Caméra</Text>
+            <Text style={styles.permissionTitle}>Camera</Text>
             <Text style={styles.permissionDescription}>
-              Nécessaire pour prendre des photos et des vidéos.
+              Required for taking photos and videos.
             </Text>
           </View>
           <Button
-            title={permissionsStatus.camera?.granted ? "Granted" : "Allow"}
+            title={permissionsStatus?.camera?.granted ? "Granted" : "Allow"}
             onPress={() => requestPermission("camera", requestCameraPermission)}
             loading={loadingStates.camera}
             style={[
               styles.permissionButton,
-              permissionsStatus.camera?.granted && styles.buttonGranted,
+              permissionsStatus?.camera?.granted && styles.buttonGranted,
             ]}
-            disabled={permissionsStatus.camera?.granted}
+            disabled={permissionsStatus?.camera?.granted}
           />
         </View>
 
-        {/* Permission Audio */}
         <View style={styles.permissionItem}>
           <Ionicons
             name="mic"
             size={24}
             color={
-              permissionsStatus.audio?.granted ? Colors.success : Colors.error
+              permissionsStatus?.audio?.granted ? Colors.success : Colors.error
             }
             style={styles.icon}
           />
           <View style={styles.permissionTextContainer}>
             <Text style={styles.permissionTitle}>Audio</Text>
             <Text style={styles.permissionDescription}>
-              Nécessaire pour enregistrer du son ou passer des appels.
+              Required for recording audio or making calls.
             </Text>
           </View>
           <Button
-            title={permissionsStatus.audio?.granted ? "Granted" : "Allow"}
+            title={permissionsStatus?.audio?.granted ? "Granted" : "Allow"}
             onPress={() => requestPermission("audio", requestAudioPermission)}
             loading={loadingStates.audio}
             style={[
               styles.permissionButton,
-              permissionsStatus.audio?.granted && styles.buttonGranted,
+              permissionsStatus?.audio?.granted && styles.buttonGranted,
             ]}
-            disabled={permissionsStatus.audio?.granted}
+            disabled={permissionsStatus?.audio?.granted}
           />
         </View>
 
-        {/* Permission Localisation */}
         <View style={styles.permissionItem}>
           <Ionicons
             name="location"
             size={24}
             color={
-              permissionsStatus.location?.granted
+              permissionsStatus?.location?.granted
                 ? Colors.success
                 : Colors.error
             }
             style={styles.icon}
           />
           <View style={styles.permissionTextContainer}>
-            <Text style={styles.permissionTitle}>Localisation</Text>
+            <Text style={styles.permissionTitle}>Location</Text>
             <Text style={styles.permissionDescription}>
-              Nécessaire pour fournir des services basés sur votre position.
+              Necessary to provide location-based services.
             </Text>
           </View>
           <Button
-            title={permissionsStatus.location?.granted ? "Granted" : "Allow"}
+            title={permissionsStatus?.location?.granted ? "Granted" : "Allow"}
             onPress={() =>
               requestPermission("location", requestLocationPermission)
             }
             loading={loadingStates.location}
             style={[
               styles.permissionButton,
-              permissionsStatus.location?.granted && styles.buttonGranted,
+              permissionsStatus?.location?.granted && styles.buttonGranted,
             ]}
-            disabled={permissionsStatus.location?.granted}
+            disabled={permissionsStatus?.location?.granted}
           />
         </View>
 
-        {/* Permission Stockage */}
         <View style={styles.permissionItem}>
           <Ionicons
             name="folder"
             size={24}
             color={
-              permissionsStatus.storage?.granted ? Colors.success : Colors.error
-            }
-            style={styles.icon}
-          />
-          <View style={styles.permissionTextContainer}>
-            <Text style={styles.permissionTitle}>Stockage</Text>
-            <Text style={styles.permissionDescription}>
-              Nécessaire pour accéder à vos photos et fichiers.
-            </Text>
-          </View>
-          <Button
-            title={permissionsStatus.storage?.granted ? "Granted" : "Allow"}
-            onPress={() =>
-              requestPermission("storage", requestStoragePermission)
-            }
-            loading={loadingStates.storage}
-            style={[
-              styles.permissionButton,
-              permissionsStatus.storage?.granted && styles.buttonGranted,
-            ]}
-            disabled={permissionsStatus.storage?.granted}
-          />
-        </View>
-
-        {/* Permission Appels */}
-        <View style={styles.permissionItem}>
-          <Ionicons
-            name="call"
-            size={24}
-            color={
-              permissionsStatus.phoneCall?.granted
+              permissionsStatus?.storage?.granted
                 ? Colors.success
                 : Colors.error
             }
             style={styles.icon}
           />
           <View style={styles.permissionTextContainer}>
-            <Text style={styles.permissionTitle}>Appels</Text>
+            <Text style={styles.permissionTitle}>Storage</Text>
             <Text style={styles.permissionDescription}>
-              Nécessaire pour gérer les appels téléphoniques (Android
-              uniquement).
+              Required to access your photos and files.
             </Text>
           </View>
           <Button
-            title={permissionsStatus.phoneCall?.granted ? "Granted" : "Allow"}
+            title={permissionsStatus?.storage?.granted ? "Granted" : "Allow"}
+            onPress={() =>
+              requestPermission("storage", requestStoragePermission)
+            }
+            loading={loadingStates.storage}
+            style={[
+              styles.permissionButton,
+              permissionsStatus?.storage?.granted && styles.buttonGranted,
+            ]}
+            disabled={permissionsStatus?.storage?.granted}
+          />
+        </View>
+
+        <View style={styles.permissionItem}>
+          <Ionicons
+            name="call"
+            size={24}
+            color={
+              permissionsStatus?.phoneCall?.granted
+                ? Colors.success
+                : Colors.error
+            }
+            style={styles.icon}
+          />
+          <View style={styles.permissionTextContainer}>
+            <Text style={styles.permissionTitle}>Calls</Text>
+            <Text style={styles.permissionDescription}>
+              Required to manage phone calls.
+            </Text>
+          </View>
+          <Button
+            title={permissionsStatus?.phoneCall?.granted ? "Granted" : "Allow"}
             onPress={() =>
               requestPermission("phoneCall", requestPhoneCallPermission)
             }
             loading={loadingStates.phoneCall}
             style={[
               styles.permissionButton,
-              permissionsStatus.phoneCall?.granted && styles.buttonGranted,
+              permissionsStatus?.phoneCall?.granted && styles.buttonGranted,
             ]}
-            disabled={permissionsStatus.phoneCall?.granted}
+            disabled={permissionsStatus?.phoneCall?.granted}
           />
         </View>
       </View>
 
       <Button
-        title="Continuer"
-        // onPress={() => router.replace("/home")}
+        title="Next"
+        onPress={handleContinue}
+        loading={loadingStates.continue}
         style={[
           styles.continueButton,
           !allPermissionsGranted && styles.buttonDisabled,
@@ -305,9 +297,9 @@ const createStyles = (Colors, Fonts, Styles) =>
       flex: 1,
       backgroundColor: Colors.background,
       paddingTop: Platform.OS === "android" ? StatusBar.currentHeight + 20 : 60,
+      paddingHorizontal: Styles.padding.sm,
     },
     contentContainer: {
-      paddingHorizontal: Styles.padding.sm,
       paddingBottom: Styles.padding.xl,
     },
     title: {
@@ -379,7 +371,7 @@ const createStyles = (Colors, Fonts, Styles) =>
       alignItems: "center",
       marginTop: Styles.margin.xl,
       elevation: 2,
-      shadowColor: "#000",
+      shadowColor: Colors.black,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.23,
       shadowRadius: 2.62,

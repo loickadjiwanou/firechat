@@ -26,19 +26,24 @@ import { auth } from "../configs/firebaseConfig";
 const OthersMethods = ({ from, type }) => {
   const { Colors, Fonts, Styles } = useTheme();
   const styles = createStyles(Colors, Fonts, Styles);
+  const { warningToast } = useToast();
 
   const handleOtherMethodPress = (from, type) => {
     if (from == "login") {
       if (type == "google") {
         // login google
+        warningToast("Login with Google", "Available soon...");
       } else if (type == "apple") {
         // login apple
+        warningToast("Login with Apple", "Available soon...");
       }
     } else if (from == "register") {
       if (type == "google") {
         // register google
+        warningToast("Register with Google", "Available soon...");
       } else if (type == "apple") {
         // register apple
+        warningToast("Register with Apple", "Available soon...");
       }
     }
   };
@@ -48,7 +53,7 @@ const OthersMethods = ({ from, type }) => {
       <TouchableOpacity
         style={styles.othersMethod}
         hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
-        activeOpacity={0.8}
+        activeOpacity={0.5}
         onPress={() => handleOtherMethodPress(from, "google")}
       >
         <Ionicons name="logo-google" size={24} color={Colors.bw} />
@@ -58,7 +63,7 @@ const OthersMethods = ({ from, type }) => {
       <TouchableOpacity
         style={styles.othersMethod}
         hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
-        activeOpacity={0.8}
+        activeOpacity={0.5}
         onPress={() => handleOtherMethodPress(from, "apple")}
       >
         <FontAwesome name="apple" size={25} color={Colors.bw} />
@@ -481,7 +486,7 @@ const createStyles = (Colors, Fonts, Styles) =>
       alignItems: "center",
       gap: 10,
       justifyContent: "center",
-      borderWidth: 1.5,
+      borderWidth: 1,
       borderColor: Colors.bw + "20",
       borderRadius: Styles.borderRadius.xxxl,
       height: Styles.size.xlg,

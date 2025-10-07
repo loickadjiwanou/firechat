@@ -18,6 +18,7 @@ const Button = ({
   onPress,
   roundness = "medium",
   full = false,
+  disabled = false,
 }) => {
   const Icon = iconFamily === "Feather" ? Feather : Feather;
 
@@ -47,9 +48,9 @@ const Button = ({
       // onPress={onPress}
       onPress={async () => {
         await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        if (onPress) onPress();
+        if (onPress && !disabled) onPress();
       }}
-      disabled={loading}
+      disabled={disabled}
       style={({ pressed }) => [
         buttonStyles,
         pressed && styles.buttonPressed,

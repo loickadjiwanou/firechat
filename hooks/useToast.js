@@ -86,11 +86,16 @@ export const useToast = () => {
     }
   };
 
+  const sanitizeEmail = (email) => {
+    if (typeof email !== "string" || !email.includes("@")) return email;
+    return email.slice(0, email.indexOf("@"));
+  };
+
   const loginSuccessToast = (email) => {
     showToast({
       type: "success",
       message: "Login Successful",
-      subMessage: `Welcome, ${email}!`,
+      subMessage: `Welcome back, ${sanitizeEmail(email)}!`,
       theme: theme,
     });
   };
