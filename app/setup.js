@@ -23,12 +23,24 @@ import {
 } from "firebase/auth";
 import { auth } from "../configs/firebaseConfig";
 
-const OthersMethods = ({ from }) => {
+const OthersMethods = ({ from, type }) => {
   const { Colors, Fonts, Styles } = useTheme();
   const styles = createStyles(Colors, Fonts, Styles);
 
-  const handleOtherMethodPress = (from) => {
-    console.log("from: ", from);
+  const handleOtherMethodPress = (from, type) => {
+    if (from == "login") {
+      if (type == "google") {
+        // login google
+      } else if (type == "apple") {
+        // login apple
+      }
+    } else if (from == "register") {
+      if (type == "google") {
+        // register google
+      } else if (type == "apple") {
+        // register apple
+      }
+    }
   };
 
   return (
@@ -37,7 +49,7 @@ const OthersMethods = ({ from }) => {
         style={styles.othersMethod}
         hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
         activeOpacity={0.8}
-        onPress={() => handleOtherMethodPress(from)}
+        onPress={() => handleOtherMethodPress(from, "google")}
       >
         <Ionicons name="logo-google" size={24} color={Colors.bw} />
         <Text style={styles.othersMethodText}>Google</Text>
@@ -47,7 +59,7 @@ const OthersMethods = ({ from }) => {
         style={styles.othersMethod}
         hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
         activeOpacity={0.8}
-        onPress={() => handleOtherMethodPress(from)}
+        onPress={() => handleOtherMethodPress(from, "apple")}
       >
         <FontAwesome name="apple" size={25} color={Colors.bw} />
         <Text style={styles.othersMethodText}>Apple</Text>
