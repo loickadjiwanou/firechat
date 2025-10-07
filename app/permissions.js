@@ -54,6 +54,10 @@ export default function PermissionsScreen() {
           message: "All permissions granted",
           subMessage: "",
         });
+        setLoadingStates((prev) => ({ ...prev, continue: true }));
+        setTimeout(() => {
+          router.replace("/home");
+        }, 1000);
       }
     };
 
@@ -91,6 +95,10 @@ export default function PermissionsScreen() {
           message: "All permissions granted",
           subMessage: "",
         });
+        setLoadingStates((prev) => ({ ...prev, continue: true }));
+        setTimeout(() => {
+          router.replace("/home");
+        }, 1000);
       }
     } catch (error) {
       showToast({
