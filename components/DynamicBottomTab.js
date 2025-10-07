@@ -15,11 +15,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 import { makeMutable } from "react-native-reanimated";
-import { useTheme } from "../hooks/useTheme";
+import { Colors, useTheme } from "../hooks/useTheme";
 import { useRouter, usePathname } from "expo-router";
 
 // Constants
-const BOTTOM_BAR_HEIGHT = 70;
+const BOTTOM_BAR_HEIGHT = 60;
 const LINEAR_GRADIENT_HEIGHT = 100;
 const LINEAR_GRADIENT_COLORS = [
   "rgba(255,255,255,0)",
@@ -83,7 +83,8 @@ const TabBarItem = React.memo(({ onPress, screenName, focused }) => {
       return (
         <Ionicons
           {...icon}
-          color={focused ? Colors.primaryBlue : Colors.bw + "80"}
+          color={focused ? Colors.primaryBlue : Colors.gray + "80"}
+          style={{ marginTop: 0 }}
         />
       );
     },
@@ -146,7 +147,7 @@ const BottomTabBar = ({ state }) => {
       [0, 1],
       [0.15 * SCREEN_WIDTH, 20]
     );
-    const borderWidth = interpolate(progress.value, [0, 1], [1, 0.6]);
+    const borderWidth = interpolate(progress.value, [0, 0.2], [0.2, 0.2]);
 
     return {
       left: leftRight,
@@ -227,7 +228,7 @@ const styles = StyleSheet.create({
   bottomContainer: {
     borderCurve: "continuous",
     overflow: "hidden",
-    borderColor: "rgba(216, 216, 216, 0.597)",
+    borderColor: Colors.bw + "40",
     position: "absolute",
   },
   blurViewStyle: {
