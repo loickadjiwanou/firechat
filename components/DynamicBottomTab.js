@@ -74,10 +74,10 @@ const TabBarItem = React.memo(({ onPress, screenName, focused }) => {
   const getIconByScreenName = useCallback(
     (pageName) => {
       const icons = {
-        chats: { name: "chatbox-ellipses-outline", size: 30 },
-        groups: { name: "grid-outline", size: 24 },
-        calls: { name: "call-outline", size: 25 },
-        settings: { name: "settings-outline", size: 25 },
+        chats: { name: "chatbubbles-outline", size: 28 },
+        groups: { name: "grid-outline", size: 26 },
+        calls: { name: "call-outline", size: 26 },
+        settings: { name: "settings-outline", size: 26 },
       };
 
       const icon = icons[pageName];

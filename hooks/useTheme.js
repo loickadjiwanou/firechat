@@ -25,6 +25,9 @@ export const Colors = {
     info: "#2196F3",
     warning: "#FF9800",
     backgroundtoast: "#333",
+    userBarBackground: "#e3e3e3ff",
+    tileBgColor: "#ffffff",
+    floatingBottomTabBg: "#606060ff",
   },
   dark: {
     black: "#000000",
@@ -50,6 +53,9 @@ export const Colors = {
     info: "#2196F3",
     warning: "#FF9800",
     backgroundtoast: "#333",
+    userBarBackground: "#202020ff",
+    tileBgColor: "#767676ff",
+    floatingBottomTabBg: "#202020ff",
   },
 };
 
@@ -67,6 +73,7 @@ export const Fonts = {
     xl: 20,
     xxl: 24,
     xxxl: 30,
+    xxg: 40,
     xlg: 50,
   },
 };

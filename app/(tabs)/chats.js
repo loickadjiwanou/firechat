@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, Platform, ScrollView } from "react-native";
 import Animated, { useAnimatedScrollHandler } from "react-native-reanimated";
 import { useTheme } from "../../hooks/useTheme";
 import { IsTabBarActive } from "../../components/DynamicBottomTab";
-import UserBar from "../../components/UserBar";
 import { StatusBar } from "expo-status-bar";
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
@@ -32,13 +31,6 @@ export default function ChatsScreen() {
         }}
         style={{ flex: 1, backgroundColor: Colors.background }}
       >
-        <UserBar
-          from="chats"
-          backgroundColor={Colors.background}
-          backArrow={false}
-          searchIcon={true}
-          moreIcon={true}
-        />
         <View style={styles.placeholder}>
           <Text style={styles.placeholderText}>
             Chats content coming soon...
@@ -54,7 +46,7 @@ const createStyles = (Colors, Fonts, Styles) =>
     container: {
       flex: 1,
       backgroundColor: Colors.background,
-      paddingTop: Platform.OS === "android" ? StatusBar.currentHeight + 10 : 50,
+      //   paddingTop: Platform.OS === "android" ? StatusBar.currentHeight + 10 : 50,
       paddingHorizontal: Styles.padding.sm,
     },
     placeholder: {
