@@ -1,77 +1,85 @@
 import React from "react";
-import { View, Text, StyleSheet, useWindowDimensions } from "react-native";
-import Animated, { useAnimatedScrollHandler } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  useWindowDimensions,
+} from "react-native";
 import { useTheme } from "../../hooks/useTheme";
-import { IsTabBarActive } from "../../components/DynamicBottomTab";
-
-const generateDummyData = () => {
-  return Array(100)
-    .fill(null)
-    .map((_, index) => ({
-      id: index,
-      title: `Item ${index + 1}`,
-      color: `hsl(${Math.random() * 360}, 70%, 60%)`,
-    }));
-};
 
 export default function CallsScreen() {
-  const { Colors } = useTheme();
-  const { top: safeTop } = useSafeAreaInsets();
+  const { Colors, Styles, Fonts } = useTheme();
+  const styles = createStyles(Colors, Fonts, Styles);
+
   const { width } = useWindowDimensions();
-  const data = generateDummyData();
-
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      IsTabBarActive.value = event.contentOffset.y <= 0;
-    },
-  });
-
-  const renderItem = ({ item }) => (
-    <View
-      style={[
-        styles.card,
-        {
-          backgroundColor: item.color,
-          width: (width - 24 * 3) / 2,
-        },
-      ]}
-    >
-      <Text style={[styles.cardText, { color: Colors.bw }]}>{item.title}</Text>
-    </View>
-  );
+  const generateDummyData = () => {
+    return Array(100)
+      .fill(null)
+      .map((_, index) => ({
+        id: index,
+        title: `Item ${index + 1}`,
+        color: `hsl(${Math.random() * 360}, 70%, 60%)`,
+      }));
+  };
 
   return (
-    <Animated.FlatList
-      data={data}
-      renderItem={renderItem}
-      keyExtractor={(item) => item.id.toString()}
-      numColumns={2}
-      onScroll={scrollHandler}
-      scrollEventThrottle={16}
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={{
-        padding: 12,
-        paddingTop: safeTop + 12,
-        backgroundColor: Colors.background,
-      }}
-      style={{ flex: 1, backgroundColor: Colors.background }}
-    />
+    <View style={styles.view}>
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        showsVerticalScrollIndicator={false}
+        overScrollMode="never"
+        style={styles.container}
+      >
+        <Text>Groups</Text>
+        {generateDummyData().map((item) => (
+          <View
+            key={item.id}
+            style={[
+              styles.card,
+              {
+                backgroundColor: item.color,
+              },
+            ]}
+          >
+            <Text style={[styles.cardText, { color: Colors.bw }]}>
+              {item.title}
+            </Text>
+          </View>
+        ))}
+        <View style={styles.footer} />
+      </ScrollView>
+    </View>
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    margin: 12,
-    padding: 16,
-    borderRadius: 8,
-    justifyContent: "center",
-    alignItems: "center",
-    height: 120,
-  },
-  cardText: {
-    fontSize: 16,
-    fontFamily: "FredokaMedium",
-    textAlign: "center",
-  },
-});
+const createStyles = (Colors, Fonts, Styles) =>
+  StyleSheet.create({
+    view: {
+      flex: 1,
+      backgroundColor: Colors.userBarBackground,
+      paddingTop: 75,
+    },
+    container: {
+      backgroundColor: Colors.background,
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      paddingHorizontal: Styles.padding.sm,
+      paddingVertical: 10,
+    },
+    footer: {
+      paddingBottom: 180,
+    },
+    card: {
+      borderRadius: 10,
+      marginVertical: 10,
+      justifyContent: "center",
+      alignItems: "center",
+      height: 100,
+    },
+    cardText: {
+      fontSize: Fonts.sizes.md,
+      fontFamily: Fonts.family.FredokaMedium,
+      textAlign: "center",
+    },
+  });

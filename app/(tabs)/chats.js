@@ -1,64 +1,37 @@
 import React from "react";
-import { View, Text, StyleSheet, Platform, ScrollView } from "react-native";
-import Animated, { useAnimatedScrollHandler } from "react-native-reanimated";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { useTheme } from "../../hooks/useTheme";
-import { IsTabBarActive } from "../../components/DynamicBottomTab";
-import { StatusBar } from "expo-status-bar";
-
-const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
 export default function ChatsScreen() {
   const { Colors, Styles, Fonts } = useTheme();
   const styles = createStyles(Colors, Fonts, Styles);
 
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      IsTabBarActive.value = event.contentOffset.y <= 0;
-    },
-  });
-
   return (
-    <View style={styles.container}>
-      <StatusBar style="auto" />
-      <AnimatedScrollView
+    <View style={styles.view}>
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
-        onScroll={scrollHandler}
-        scrollEventThrottle={16}
         overScrollMode="never"
-        contentContainerStyle={{
-          flexGrow: 1,
-          backgroundColor: Colors.background,
-        }}
-        style={{ flex: 1, backgroundColor: Colors.background }}
+        style={styles.container}
       >
-        <View style={styles.placeholder}>
-          <Text style={styles.placeholderText}>
-            Chats content coming soon...
-          </Text>
-        </View>
-      </AnimatedScrollView>
+        <Text>Chats</Text>
+      </ScrollView>
     </View>
   );
 }
 
 const createStyles = (Colors, Fonts, Styles) =>
   StyleSheet.create({
+    view: {
+      flex: 1,
+      backgroundColor: Colors.userBarBackground,
+      paddingTop: 75,
+    },
     container: {
-      flex: 1,
       backgroundColor: Colors.background,
-      //   paddingTop: Platform.OS === "android" ? StatusBar.currentHeight + 10 : 50,
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
       paddingHorizontal: Styles.padding.sm,
-    },
-    placeholder: {
-      flex: 1,
-      height: 1000, // Ensure enough height to trigger scrolling
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    placeholderText: {
-      fontSize: 16,
-      fontFamily: Fonts.FredokaMedium,
-      color: Colors.gray,
-      textAlign: "center",
+      paddingVertical: 10,
     },
   });
