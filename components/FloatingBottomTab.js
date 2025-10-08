@@ -24,7 +24,7 @@ import { useTheme } from "../hooks/useTheme";
 
 const ScreenNames = {
   Chats: "chats",
-  Groups: "groups",
+  Groups: "groupss",
   Calls: "calls",
   Settings: "settings",
 };
