@@ -1,5 +1,5 @@
-import { Tabs, usePathname } from "expo-router";
-import { View, TouchableOpacity } from "react-native";
+import { Tabs, usePathname, router } from "expo-router";
+import { View } from "react-native";
 import { useTheme } from "../../hooks/useTheme";
 import FloatingBottomTab from "../../components/FloatingBottomTab";
 import UserBar from "../../components/UserBar";
@@ -20,10 +20,10 @@ export default function TabsLayout() {
 
   const pressFloatingButton = () => {
     if (pathName?.slice(1) == "chats") {
-      console.log("new chat");
+      router.push("/contacts");
     }
     if (pathName?.slice(1) == "groups") {
-      console.log("new group");
+      router.push("/contacts-groups");
     }
   };
 

@@ -81,6 +81,18 @@ export default function RootLayout() {
           name="(tabs)"
           options={{ gestureEnabled: false, headerBackVisible: false }}
         />
+        <Stack.Screen
+          name="contacts"
+          options={{
+            presentation: "modal",
+          }}
+        />
+        <Stack.Screen
+          name="contacts-groups"
+          options={{
+            presentation: "modal",
+          }}
+        />
       </Stack>
 
       <ToastManager
