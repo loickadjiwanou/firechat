@@ -87,14 +87,14 @@ export default function ContactsScreen() {
   const createChat = async (recipient) => {
     let recipientId = recipient.id;
     try {
-      console.log(
-        "Creating chat with user:",
-        user.uid,
-        "and recipient:",
-        recipientId
-      );
+      // console.log(
+      //   "Creating chat with user:",
+      //   user.uid,
+      //   "and recipient:",
+      //   recipientId
+      // );
       const chatId = [user.uid, recipientId].sort().join("_");
-      console.log("Chat ID:", chatId);
+      // console.log("Chat ID:", chatId);
       await setDoc(
         doc(db, "chats", chatId),
         {
@@ -120,11 +120,11 @@ export default function ContactsScreen() {
     const matchedUser = users.find((u) =>
       contactEmails.includes(u.email?.toLowerCase())
     );
-    console.log(
-      `Checking contact: ${item.name}, Emails: ${contactEmails.join(
-        ", "
-      )}, Matched: ${!!matchedUser}`
-    );
+    // console.log(
+    //   `Checking contact: ${item.name}, Emails: ${contactEmails.join(
+    //     ", "
+    //   )}, Matched: ${!!matchedUser}`
+    // );
 
     if (!matchedUser) return null;
 
