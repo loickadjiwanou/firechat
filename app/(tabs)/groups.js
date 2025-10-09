@@ -31,7 +31,6 @@ export default function GroupsScreen() {
         overScrollMode="never"
         style={styles.container}
       >
-        <Text>Groups</Text>
         {generateDummyData().map((item) => (
           <View
             key={item.id}
