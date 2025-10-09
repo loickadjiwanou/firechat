@@ -5,7 +5,6 @@ import * as SplashScreen from "expo-splash-screen";
 import { Stack, useRouter } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import ToastManager from "toastify-react-native";
-
 import { useTheme } from "../hooks/useTheme";
 import { useAuthListener } from "../hooks/useAuthListener";
 
@@ -81,23 +80,23 @@ export default function RootLayout() {
           name="(tabs)"
           options={{ gestureEnabled: false, headerBackVisible: false }}
         />
-        <Stack.Screen
-          name="contacts"
-          options={{
-            presentation: "modal",
-          }}
-        />
+        <Stack.Screen name="contacts" options={{ presentation: "modal" }} />
         <Stack.Screen
           name="contacts-groups"
+          options={{ presentation: "modal" }}
+        />
+        <Stack.Screen
+          name="chat-room/[id]"
           options={{
-            presentation: "modal",
+            gestureEnabled: true,
+            headerBackVisible: true,
           }}
         />
       </Stack>
 
       <ToastManager
         position="bottom"
-        duration={4000}
+        duration={3000}
         showCloseIcon
         showProgressBar
         iconFamily="Ionicons"

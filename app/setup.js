@@ -21,7 +21,8 @@ import {
   signInWithEmailAndPassword,
   updateProfile,
 } from "firebase/auth";
-import { auth } from "../configs/firebaseConfig";
+import { auth, db } from "../configs/firebaseConfig";
+import { doc, setDoc } from "firebase/firestore";
 
 const OthersMethods = ({ from, type }) => {
   const { Colors, Fonts, Styles } = useTheme();
@@ -31,18 +32,14 @@ const OthersMethods = ({ from, type }) => {
   const handleOtherMethodPress = (from, type) => {
     if (from == "login") {
       if (type == "google") {
-        // login google
         warningToast("Login with Google", "Available soon...");
       } else if (type == "apple") {
-        // login apple
         warningToast("Login with Apple", "Available soon...");
       }
     } else if (from == "register") {
       if (type == "google") {
-        // register google
         warningToast("Register with Google", "Available soon...");
       } else if (type == "apple") {
-        // register apple
         warningToast("Register with Apple", "Available soon...");
       }
     }
@@ -254,6 +251,21 @@ export default function Setup() {
   } = useToast();
   const styles = createStyles(Colors, Fonts, Styles);
 
+  // Create user profile in Firestore
+  const createUserProfile = async (user) => {
+    try {
+      await setDoc(doc(db, "users", user.uid), {
+        displayName: user.displayName || user.email.split("@")[0],
+        email: user.email,
+        photoURL: user.photoURL || null,
+      });
+      console.log("User profile created successfully");
+    } catch (error) {
+      console.error("Error creating user profile:", error);
+      registerErrorToast(error.code || "Error creating user profile");
+    }
+  };
+
   const handleLogin = async ({ email, password, setLoading }) => {
     if (!email || !password) {
       missingFieldsToast();
@@ -315,6 +327,7 @@ export default function Setup() {
       );
       const user = userCredential.user;
       await updateProfile(user, { displayName: fullName });
+      await createUserProfile(user);
       console.log("User registered:", user.email);
       registerSuccessToast(user.email);
       router.replace("/permissions");

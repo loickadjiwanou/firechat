@@ -189,6 +189,15 @@ export const useToast = () => {
     });
   };
 
+  const genericSuccessToast = (message, subMessage = "") => {
+    showToast({
+      type: "success",
+      message,
+      subMessage,
+      theme: theme,
+    });
+  };
+
   const genericErrorToast = (
     message,
     subMessage = "An unexpected error occurred."

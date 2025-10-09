@@ -4,7 +4,7 @@ import { useTheme } from "../hooks/useTheme";
 import { Entypo, Octicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useAuthListener } from "../hooks/useAuthListener";
-import profilepic from "../assets/images/profilepic.png";
+import profilepicPlaceholder from "../assets/images/profilepic.png";
 
 export default function UserBar({
   path,
@@ -27,6 +27,7 @@ export default function UserBar({
   );
 
   const { user } = useAuthListener();
+  console.log("User:", user);
 
   const capitalizeFirstLetter = (word) => {
     return word.charAt(0).toUpperCase() + word.slice(1);
@@ -52,7 +53,12 @@ export default function UserBar({
           )}
 
           <View style={styles.bloc}>
-            <Image source={profilepic} style={styles.profilepic} />
+            <Image
+              source={
+                user?.photoURL ? { uri: user?.photoURL } : profilepicPlaceholder
+              }
+              style={styles.profilepic}
+            />
             <View style={styles.textBloc}>
               <Text numberOfLines={1} style={styles.name}>
                 {user?.displayName}

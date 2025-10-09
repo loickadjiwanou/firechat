@@ -7,7 +7,7 @@ import {
   StatusBar,
   ScrollView,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { router } from "expo-router";
 import { useTheme } from "../hooks/useTheme";
 import { useToast } from "../hooks/useToast";
 import Button from "../components/Button";
@@ -19,12 +19,12 @@ import {
   requestLocationPermission,
   requestStoragePermission,
   requestPhoneCallPermission,
+  requestContactsPermission,
 } from "../hooks/usePermissionsManager";
 
 export default function PermissionsScreen() {
   const { Colors, Fonts, Styles } = useTheme();
   const { showToast } = useToast();
-  const router = useRouter();
   const [permissionsStatus, setPermissionsStatus] = useState(null);
   const [loadingStates, setLoadingStates] = useState({
     camera: false,
@@ -32,6 +32,7 @@ export default function PermissionsScreen() {
     location: false,
     storage: false,
     phoneCall: false,
+    contacts: false,
     continue: false,
   });
   const styles = createStyles(Colors, Fonts, Styles);
@@ -45,7 +46,8 @@ export default function PermissionsScreen() {
       permissions.audio?.granted &&
       permissions.location?.granted &&
       permissions.storage?.granted &&
-      permissions.phoneCall?.granted
+      permissions.phoneCall?.granted &&
+      permissions.contacts?.granted
     ) {
       setLoadingStates((prev) => ({ ...prev, continue: true }));
       showToast({
@@ -108,7 +110,8 @@ export default function PermissionsScreen() {
     permissionsStatus?.audio?.granted &&
     permissionsStatus?.location?.granted &&
     permissionsStatus?.storage?.granted &&
-    permissionsStatus?.phoneCall?.granted;
+    permissionsStatus?.phoneCall?.granted &&
+    permissionsStatus?.contacts?.granted;
 
   return (
     <ScrollView
@@ -122,6 +125,7 @@ export default function PermissionsScreen() {
       </Text>
 
       <View style={styles.permissionsContainer}>
+        {/* CAMERA */}
         <View style={styles.permissionItem}>
           <Ionicons
             name="camera"
@@ -149,6 +153,7 @@ export default function PermissionsScreen() {
           />
         </View>
 
+        {/* AUDIO */}
         <View style={styles.permissionItem}>
           <Ionicons
             name="mic"
@@ -176,6 +181,7 @@ export default function PermissionsScreen() {
           />
         </View>
 
+        {/* LOCATION */}
         <View style={styles.permissionItem}>
           <Ionicons
             name="location"
@@ -207,6 +213,7 @@ export default function PermissionsScreen() {
           />
         </View>
 
+        {/* STORAGE */}
         <View style={styles.permissionItem}>
           <Ionicons
             name="folder"
@@ -238,6 +245,7 @@ export default function PermissionsScreen() {
           />
         </View>
 
+        {/* PHONE CALL */}
         <View style={styles.permissionItem}>
           <Ionicons
             name="call"
@@ -266,6 +274,38 @@ export default function PermissionsScreen() {
               permissionsStatus?.phoneCall?.granted && styles.buttonGranted,
             ]}
             disabled={permissionsStatus?.phoneCall?.granted}
+          />
+        </View>
+
+        {/* CONTACTS */}
+        <View style={styles.permissionItem}>
+          <Ionicons
+            name="people"
+            size={24}
+            color={
+              permissionsStatus?.contacts?.granted
+                ? Colors.success
+                : Colors.error
+            }
+            style={styles.icon}
+          />
+          <View style={styles.permissionTextContainer}>
+            <Text style={styles.permissionTitle}>Contacts</Text>
+            <Text style={styles.permissionDescription}>
+              Required to access your phone contacts.
+            </Text>
+          </View>
+          <Button
+            title={permissionsStatus?.contacts?.granted ? "Granted" : "Allow"}
+            onPress={() =>
+              requestPermission("contacts", requestContactsPermission)
+            }
+            loading={loadingStates.contacts}
+            style={[
+              styles.permissionButton,
+              permissionsStatus?.contacts?.granted && styles.buttonGranted,
+            ]}
+            disabled={permissionsStatus?.contacts?.granted}
           />
         </View>
       </View>

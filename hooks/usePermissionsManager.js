@@ -2,6 +2,7 @@ import { Platform, PermissionsAndroid } from "react-native";
 import { Camera } from "expo-camera";
 import * as Location from "expo-location";
 import * as MediaLibrary from "expo-media-library";
+import * as Contacts from "expo-contacts";
 
 const handlePermissionError = (permissionType, error) => {
   console.error(`Error while requesting ${permissionType}:`, error);
@@ -87,6 +88,19 @@ export const requestPhoneCallPermission = async () => {
   }
 };
 
+// Contacts
+export const requestContactsPermission = async () => {
+  try {
+    const { status } = await Contacts.requestPermissionsAsync();
+    return {
+      granted: status === "granted",
+      status,
+    };
+  } catch (error) {
+    return handlePermissionError("contacts", error);
+  }
+};
+
 // Check all permissions
 export const checkAllPermissions = async () => {
   try {
@@ -94,6 +108,7 @@ export const checkAllPermissions = async () => {
     const mic = await Camera.getMicrophonePermissionsAsync();
     const location = await Location.getForegroundPermissionsAsync();
     const storage = await MediaLibrary.getPermissionsAsync();
+    const contacts = await Contacts.getPermissionsAsync();
 
     let phoneCall = { granted: true, status: "granted" };
     if (Platform.OS === "android") {
@@ -108,6 +123,7 @@ export const checkAllPermissions = async () => {
       audio: mic,
       location,
       storage,
+      contacts,
       phoneCall,
     };
   } catch (error) {

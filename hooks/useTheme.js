@@ -28,6 +28,7 @@ export const Colors = {
     userBarBackground: "#e3e3e3ff",
     tileBgColor: "#ffffff",
     floatingBottomTabBg: "#606060ff",
+    separator: "#f5f5f5",
   },
   dark: {
     black: "#000000",
@@ -56,6 +57,7 @@ export const Colors = {
     userBarBackground: "#202020ff",
     tileBgColor: "#767676ff",
     floatingBottomTabBg: "#202020ff",
+    separator: "#30302E",
   },
 };
 

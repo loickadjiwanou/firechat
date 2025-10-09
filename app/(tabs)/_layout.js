@@ -11,9 +11,9 @@ export default function TabsLayout() {
   const pathName = usePathname();
   const { Colors } = useTheme();
 
-  // 🔸 Normalisation du path
   const routesMap = {
     chats: "chats",
+    "chat-room/[id]": "chats",
     contacts: "chats",
     groups: "groups",
     "contacts-groups": "groups",
@@ -21,9 +21,15 @@ export default function TabsLayout() {
     settings: "settings",
   };
 
-  const normalizedPath = routesMap[pathName.slice(1)] || pathName.slice(1);
+  const normalizedPath = (() => {
+    const path = pathName.slice(1);
+    if (path.startsWith("chat-room/")) {
+      return "chats";
+    }
+    return routesMap[path] || path;
+  })();
 
-  // 🔸 Données des paths
+  // Paths data
   const pathsData = {
     chats: { nb: 12 },
     groups: { nb: 20 },
@@ -53,7 +59,7 @@ export default function TabsLayout() {
                 backArrow={false}
                 searchIcon={true}
                 moreIcon={true}
-                onPressSearch={() => console.log("search")}
+                onPressSearch={() => setSearchVisible(true)}
                 onPressMore={() => console.log("more")}
                 barStyles={{
                   paddingTop: top,
@@ -65,7 +71,7 @@ export default function TabsLayout() {
           ),
         }}
         tabBar={() => <FloatingBottomTab />}
-      />
+      ></Tabs>
 
       {normalizedPath !== "settings" && normalizedPath !== "calls" && (
         <FloatingButton

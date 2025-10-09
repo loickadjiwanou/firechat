@@ -8,6 +8,7 @@ export const useAuthListener = () => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
+      console.log("Auth state changed:", user ? user.email : "No user");
       setUser(user);
       setAuthChecked(true);
     });
