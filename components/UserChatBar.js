@@ -3,12 +3,10 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { useTheme } from "../hooks/useTheme";
 import { Entypo, Octicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { useAuthListener } from "../hooks/useAuthListener";
 import NullUserProfilePhoto from "./NullUserProfilePhoto";
 
 export default function UserBar({
-  path,
-  pathData,
+  data,
   backgroundColor,
   backArrow,
   searchIcon,
@@ -25,13 +23,6 @@ export default function UserBar({
     backgroundColor,
     barStyles
   );
-
-  const { user } = useAuthListener();
-  console.log("User:", user);
-
-  const capitalizeFirstLetter = (word) => {
-    return word.charAt(0).toUpperCase() + word.slice(1);
-  };
 
   return (
     <View style={styles.view}>
@@ -53,18 +44,18 @@ export default function UserBar({
           )}
 
           <View style={styles.bloc}>
-            {user?.photoURL ? (
+            {data?.photoURL ? (
               <Image
-                source={{ uri: user.photoURL }}
-                style={styles.profilepic}
+                source={{ uri: data.photoURL }}
+                style={styles.profileImage}
               />
             ) : (
-              <NullUserProfilePhoto from={"UserBar"} />
+              <NullUserProfilePhoto from={"UserChatBar"} />
             )}
 
             <View style={styles.textBloc}>
               <Text numberOfLines={1} style={styles.name}>
-                {user?.displayName}
+                {data?.displayName || "- - -"}
               </Text>
               <Text style={styles.status}>💼{"  "}At work</Text>
             </View>
@@ -103,15 +94,6 @@ export default function UserBar({
           )}
         </View>
       </View>
-
-      <View style={styles.path}>
-        <Text style={styles.pathText}>{capitalizeFirstLetter(path)}</Text>
-        {pathData?.nb > 0 && (
-          <View style={styles.pathValue}>
-            <Text style={styles.pathTextValue}>{pathData?.nb}</Text>
-          </View>
-        )}
-      </View>
     </View>
   );
 }
@@ -126,14 +108,13 @@ const createStyles = (Colors, Fonts, Styles, backgroundColor, barStyles) =>
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      marginBottom: 10,
     },
     arrow: {
       marginRight: 10,
     },
     profilepic: {
-      width: 60,
-      height: 60,
+      width: 40,
+      height: 40,
       borderRadius: 50,
     },
     bloc: {
@@ -142,18 +123,17 @@ const createStyles = (Colors, Fonts, Styles, backgroundColor, barStyles) =>
       gap: 15,
     },
     textBloc: {
-      paddingVertical: 5,
       flexDirection: "column",
     },
     name: {
       color: Colors.bw,
-      fontSize: Fonts.sizes.xl,
+      fontSize: Fonts.sizes.md,
       fontFamily: Fonts.family.FredokaMedium,
       width: 130,
     },
     status: {
       color: Colors.bw,
-      fontSize: Fonts.sizes.md,
+      fontSize: Fonts.sizes.sm,
       fontFamily: Fonts.family.FredokaRegular,
     },
     searchIcon: {

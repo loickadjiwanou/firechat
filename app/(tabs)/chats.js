@@ -21,7 +21,7 @@ import {
   getDoc,
 } from "firebase/firestore";
 import { router } from "expo-router";
-import profilepicPlaceholder from "../../assets/images/profilepic.png";
+import NullUserProfilePhoto from "../../components/NullUserProfilePhoto";
 
 export default function ChatsScreen() {
   const { Colors, Styles, Fonts } = useTheme();
@@ -95,14 +95,15 @@ export default function ChatsScreen() {
           onPress={() => handleChatPress(item.id)}
           style={styles.chatItem}
         >
-          <Image
-            source={
-              recipient.photoURL
-                ? { uri: recipient.photoURL }
-                : profilepicPlaceholder
-            }
-            style={styles.profilePic}
-          />
+          {recipient?.photoURL ? (
+            <Image
+              source={{ uri: recipient.photoURL }}
+              style={styles.profilePic}
+            />
+          ) : (
+            <NullUserProfilePhoto from={"Chats"} />
+          )}
+
           <View style={styles.infoContainer}>
             <View style={styles.nameAndTime}>
               <Text style={styles.name}>{recipientName}</Text>

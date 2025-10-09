@@ -15,9 +15,10 @@ import {
   getDoc,
 } from "firebase/firestore";
 import { View } from "react-native";
-import UserBar from "../../components/UserBar";
+import UserChatBar from "../../components/UserChatBar";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "../../hooks/useTheme";
+import Loader from "../../components/Loader";
 
 export default function ChatRoom() {
   const { id } = useLocalSearchParams();
@@ -84,12 +85,12 @@ export default function ChatRoom() {
   return (
     <View style={{ flex: 1 }}>
       <View style={{ height: 100 }}>
-        <UserBar
-          path={otherUserData?.displayName || "Chat"}
-          pathData={{ nb: 0 }}
+        <UserChatBar
+          data={otherUserData}
           backgroundColor={Colors.userBarBackground}
           backArrow={true}
           searchIcon={false}
+          onPressSearch={() => console.log("Search")}
           moreIcon={true}
           onPressMore={() => console.log("More options")}
           barStyles={{
@@ -103,6 +104,13 @@ export default function ChatRoom() {
         messages={messages}
         onSend={(messages) => onSend(messages)}
         user={{ _id: user.uid, name: user.displayName }}
+      />
+      <Loader
+        visible={true}
+        color={Colors.primaryBlue}
+        textColor={Colors.text}
+        withDelay={true}
+        delay={1200}
       />
     </View>
   );
