@@ -29,6 +29,8 @@ export const Colors = {
     tileBgColor: "#ffffff",
     floatingBottomTabBg: "#606060ff",
     separator: "#f5f5f5",
+    inputIcon: "#000000",
+    inputBorder: "#b3b3b3ff",
   },
   dark: {
     black: "#000000",
@@ -58,6 +60,8 @@ export const Colors = {
     tileBgColor: "#767676ff",
     floatingBottomTabBg: "#202020ff",
     separator: "#30302E",
+    inputIcon: "#ffffff",
+    inputBorder: "#808080",
   },
 };
 

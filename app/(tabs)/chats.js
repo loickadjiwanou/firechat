@@ -137,9 +137,15 @@ export default function ChatsScreen() {
           />
         }
       >
-        {filteredChats.map((item) => (
-          <View key={item.id}>{renderChatItem({ item })}</View>
-        ))}
+        {filteredChats?.length > 0 ? (
+          filteredChats.map((item) => (
+            <View key={item.id}>{renderChatItem({ item })}</View>
+          ))
+        ) : (
+          <View style={styles.noChatsContainer}>
+            <Text style={styles.noChatsText}>No Chats !</Text>
+          </View>
+        )}
         <View style={styles.footer} />
       </ScrollView>
     </View>
@@ -201,5 +207,15 @@ const createStyles = (Colors, Fonts, Styles) =>
       fontSize: Fonts.sizes.sm,
       fontFamily: Fonts.family.FredokaRegular,
       color: Colors.gray,
+    },
+    noChatsContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    noChatsText: {
+      fontSize: Fonts.sizes.lg,
+      fontFamily: Fonts.family.FredokaRegular,
+      color: Colors.text,
     },
   });

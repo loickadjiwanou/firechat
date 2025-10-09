@@ -34,13 +34,12 @@ export default function SettingsScreen() {
         overScrollMode="never"
         style={styles.container}
       >
-        <Text>Settings</Text>
-
         <Text style={styles.title}>
           Welcome, {user?.displayName || "User"}!
         </Text>
         <Text style={styles.subtitle}>
-          You're now connected to your account.
+          You're now connected to your account.{"\n"}
+          {user?.email}
         </Text>
         <Button
           title="Sign Out"

@@ -19,9 +19,9 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { router } from "expo-router";
-import profilepicPlaceholder from "../assets/images/profilepic.png";
 import * as Contacts from "expo-contacts";
 import { useToast } from "../hooks/useToast";
+import NullUserProfilePhoto from "../components/NullUserProfilePhoto";
 
 export default function ContactsScreen() {
   const { Colors, Styles, Fonts } = useTheme();
@@ -68,12 +68,12 @@ export default function ContactsScreen() {
   useEffect(() => {
     (async () => {
       const { status } = await Contacts.requestPermissionsAsync();
-      console.log("Contact permissions status:", status);
+      // console.log("Contact permissions status:", status);
       if (status === "granted") {
         const { data } = await Contacts.getContactsAsync({
           fields: [Contacts.Fields.Emails, Contacts.Fields.Name],
         });
-        console.log("Phone contacts:", data);
+        // console.log("Phone contacts:", data);
         setContacts(data);
       } else {
         console.log("Contact permissions denied");
@@ -133,10 +133,14 @@ export default function ContactsScreen() {
         onPress={() => createChat(matchedUser)}
         style={styles.contactItem}
       >
-        <Image
-          source={matchedUser.photoURL || profilepicPlaceholder}
-          style={styles.profilePic}
-        />
+        {matchedUser.photoURL ? (
+          <Image
+            source={{ uri: matchedUser.photoURL }}
+            style={styles.profilePic}
+          />
+        ) : (
+          <NullUserProfilePhoto from={"Contacts"} />
+        )}
         <Text style={styles.name}>{matchedUser.displayName || item.name}</Text>
       </TouchableOpacity>
     );
@@ -171,9 +175,9 @@ export default function ContactsScreen() {
 
   if (matchedContacts.length === 0) {
     return (
-      <View style={styles.view}>
+      <View style={styles.noContactsView}>
         <Text style={styles.noContactsText}>
-          Aucun contact trouvé avec un compte Firestore correspondant.
+          No contacts found{"\n"}with a matching FireChat account.
         </Text>
       </View>
     );
@@ -214,16 +218,22 @@ const createStyles = (Colors, Fonts, Styles) =>
       width: 50,
       height: 50,
       borderRadius: 25,
-      marginRight: 10,
     },
     name: {
-      fontSize: 16,
-      fontWeight: "bold",
+      fontSize: Fonts.sizes.md,
+      fontFamily: Fonts.family.FredokaRegular,
       color: Colors.text,
+      marginLeft: 10,
+    },
+    noContactsView: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
     },
     noContactsText: {
-      fontSize: 16,
+      fontSize: Fonts.sizes.md,
       color: Colors.text,
+      fontFamily: Fonts.family.FredokaRegular,
       textAlign: "center",
       marginTop: 20,
     },

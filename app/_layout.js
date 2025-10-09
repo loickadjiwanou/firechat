@@ -37,10 +37,10 @@ export default function RootLayout() {
       hasRedirected.current = true;
 
       if (user) {
-        console.log("✅ User is logged in:", user.email);
+        // console.log("✅ User is logged in:", user.email);
         router.replace("(tabs)/chats");
       } else {
-        console.log("🚪 User is not logged in");
+        // console.log("🚪 User is not logged in");
         router.replace("/");
       }
     }

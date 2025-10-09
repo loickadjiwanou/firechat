@@ -27,7 +27,6 @@ export default function UserBar({
   );
 
   const { user } = useAuthListener();
-  console.log("User:", user);
 
   const capitalizeFirstLetter = (word) => {
     return word.charAt(0).toUpperCase() + word.slice(1);
