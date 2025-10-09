@@ -1,18 +1,11 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  useWindowDimensions,
-} from "react-native";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { useTheme } from "../../hooks/useTheme";
 
 export default function CallsScreen() {
   const { Colors, Styles, Fonts } = useTheme();
   const styles = createStyles(Colors, Fonts, Styles);
 
-  const { width } = useWindowDimensions();
   const generateDummyData = () => {
     return Array(100)
       .fill(null)

@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Platform } from "react-native";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { signOut, onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../configs/firebaseConfig";
-import { useRouter } from "expo-router";
+import { router } from "expo-router";
 import { useTheme } from "../../hooks/useTheme";
 import { useToast } from "../../hooks/useToast";
 import Button from "../../components/Button";
-import { StatusBar } from "expo-status-bar";
+import { useAuthListener } from "../../hooks/useAuthListener";
 
 export default function SettingsScreen() {
-  const router = useRouter();
   const { Colors, Fonts, Styles } = useTheme();
-  const { infoToast } = useToast();
-  const [userName, setUserName] = useState("");
   const styles = createStyles(Colors, Fonts, Styles);
+  const { infoToast } = useToast();
+
+  const { user } = useAuthListener();
 
   const handleSignOut = async () => {
     try {
@@ -21,29 +21,53 @@ export default function SettingsScreen() {
       infoToast("Signed Out", "You have been logged out successfully.");
       router.push("/");
     } catch (error) {
-      console.error("Sign out error:", error);
+      console.log("Sign out error:", error);
       infoToast("Error", "Failed to sign out. Please try again.");
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome, {userName || "User"}!</Text>
-      <Text style={styles.subtitle}>You're now connected to your account.</Text>
-      <Button title="Sign Out" onPress={handleSignOut} style={styles.button} />
+    <View style={styles.view}>
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        showsVerticalScrollIndicator={false}
+        overScrollMode="never"
+        style={styles.container}
+      >
+        <Text>Settings</Text>
+
+        <Text style={styles.title}>
+          Welcome, {user?.displayName || "User"}!
+        </Text>
+        <Text style={styles.subtitle}>
+          You're now connected to your account.
+        </Text>
+        <Button
+          title="Sign Out"
+          onPress={handleSignOut}
+          style={styles.button}
+        />
+      </ScrollView>
     </View>
   );
 }
 
 const createStyles = (Colors, Fonts, Styles) =>
   StyleSheet.create({
-    container: {
+    view: {
       flex: 1,
+      backgroundColor: Colors.userBarBackground,
+      paddingTop: 75,
+    },
+    container: {
       backgroundColor: Colors.background,
-      justifyContent: "center",
-      alignItems: "center",
-      paddingTop: Platform.OS === "android" ? StatusBar.currentHeight + 10 : 50,
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
       paddingHorizontal: Styles.padding.sm,
+      paddingVertical: 10,
+    },
+    footer: {
+      paddingBottom: 180,
     },
     title: {
       color: Colors.bw,

@@ -11,7 +11,7 @@ export default function FloatingButton({ from, icon, text, onPress }) {
 
   return (
     <TouchableOpacity
-      activeOpacity={0.8}
+      activeOpacity={0.9}
       hitSlop={{ top: 2, bottom: 2, left: 2, right: 2 }}
       onPress={onPress}
       style={styles.view}

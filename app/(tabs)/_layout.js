@@ -7,10 +7,23 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import FloatingButton from "../../components/FloatingButton";
 
 export default function TabsLayout() {
-  const { top, bottom } = useSafeAreaInsets();
+  const { top } = useSafeAreaInsets();
   const pathName = usePathname();
   const { Colors } = useTheme();
 
+  // 🔸 Normalisation du path
+  const routesMap = {
+    chats: "chats",
+    contacts: "chats",
+    groups: "groups",
+    "contacts-groups": "groups",
+    calls: "calls",
+    settings: "settings",
+  };
+
+  const normalizedPath = routesMap[pathName.slice(1)] || pathName.slice(1);
+
+  // 🔸 Données des paths
   const pathsData = {
     chats: { nb: 12 },
     groups: { nb: 20 },
@@ -19,10 +32,10 @@ export default function TabsLayout() {
   };
 
   const pressFloatingButton = () => {
-    if (pathName?.slice(1) == "chats") {
+    if (normalizedPath === "chats") {
       router.push("/contacts");
     }
-    if (pathName?.slice(1) == "groups") {
+    if (normalizedPath === "groups") {
       router.push("/contacts-groups");
     }
   };
@@ -34,8 +47,8 @@ export default function TabsLayout() {
           header: () => (
             <View style={{ height: 100 }}>
               <UserBar
-                path={pathName.slice(1)}
-                pathData={pathsData[pathName.slice(1)]}
+                path={normalizedPath}
+                pathData={pathsData[normalizedPath]}
                 backgroundColor={Colors.userBarBackground}
                 backArrow={false}
                 searchIcon={true}
@@ -54,18 +67,18 @@ export default function TabsLayout() {
         tabBar={() => <FloatingBottomTab />}
       />
 
-      {pathName.slice(1) !== "settings" && pathName.slice(1) !== "calls" && (
+      {normalizedPath !== "settings" && normalizedPath !== "calls" && (
         <FloatingButton
-          from={pathName.slice(1)}
+          from={normalizedPath}
           icon={"plus"}
           text={
-            pathName.slice(1) === "chats"
+            normalizedPath === "chats"
               ? "New Chat"
-              : pathName.slice(1) === "groups"
+              : normalizedPath === "groups"
               ? "New Group"
               : "Add"
           }
-          onPress={() => pressFloatingButton()}
+          onPress={pressFloatingButton}
         />
       )}
     </>
