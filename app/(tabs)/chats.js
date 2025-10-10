@@ -7,6 +7,7 @@ import {
   Image,
   TouchableOpacity,
   RefreshControl,
+  Platform,
 } from "react-native";
 import { useTheme } from "../../hooks/useTheme";
 import { auth, db } from "../../configs/firebaseConfig";
@@ -88,6 +89,7 @@ export default function ChatsScreen() {
     const lastMsg = item.lastMessage?.text || "No messages";
     const timestamp =
       item.lastMessage?.timestamp?.toDate()?.toLocaleTimeString() || "";
+    const unreadCount = item.unreadCount?.[user.uid] || 0;
 
     return (
       <>
@@ -107,7 +109,21 @@ export default function ChatsScreen() {
           <View style={styles.infoContainer}>
             <View style={styles.nameAndTime}>
               <Text style={styles.name}>{recipientName}</Text>
-              <Text style={styles.timestamp}>{timestamp.slice(0, 5)}</Text>
+              <View style={styles.timestampContainer}>
+                <Text style={styles.timestamp}>
+                  {Platform.select({
+                    ios: timestamp.slice(0, 5),
+                    android: timestamp.slice(0, 4),
+                  })}
+                </Text>
+                {unreadCount > 0 && (
+                  <View style={styles.unreadBadge}>
+                    <Text style={styles.unreadCount}>
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </Text>
+                  </View>
+                )}
+              </View>
             </View>
             <Text style={styles.lastMessage}>{lastMsg}</Text>
           </View>
@@ -126,7 +142,6 @@ export default function ChatsScreen() {
         style={styles.container}
         keyboardShouldPersistTaps="always"
         keyboardDismissMode="on-drag"
-        // bounces={false}
         refreshControl={
           <RefreshControl
             refreshing={false}
@@ -192,16 +207,37 @@ const createStyles = (Colors, Fonts, Styles) =>
     nameAndTime: {
       flexDirection: "row",
       justifyContent: "space-between",
+      alignItems: "center",
     },
     name: {
       fontSize: Fonts.sizes.md,
       fontFamily: Fonts.family.FredokaMedium,
       color: Colors.text,
     },
+    timestampContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
     timestamp: {
       fontSize: Fonts.sizes.sm,
       fontFamily: Fonts.family.FredokaRegular,
       color: Colors.gray,
+      marginRight: 8,
+    },
+    unreadBadge: {
+      backgroundColor: Colors.primaryBlue,
+      borderRadius: 10,
+      minWidth: 20,
+      height: 20,
+      justifyContent: "center",
+      alignItems: "center",
+      paddingHorizontal: 5,
+    },
+    unreadCount: {
+      color: Colors.bw,
+      fontSize: Fonts.sizes.xs,
+      fontFamily: Fonts.family.FredokaMedium,
+      textAlign: "center",
     },
     lastMessage: {
       fontSize: Fonts.sizes.sm,

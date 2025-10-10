@@ -70,18 +70,24 @@ export default function ChatRoom() {
             _id: doc.data().senderId,
             name: doc.data().senderName,
           },
-          readBy: doc.data().readBy || [doc.data().senderId], // Ajout de readBy
+          readBy: doc.data().readBy || [doc.data().senderId],
         }));
 
-        // Marquer les messages non lus comme lus par l'utilisateur actuel
+        // Marquer les messages non lus comme lus et réinitialiser unreadCount
         const unreadMessages = snapshot.docs.filter(
           (doc) =>
             doc.data().senderId !== user.uid &&
             !doc.data().readBy?.includes(user.uid)
         );
-        for (const doc of unreadMessages) {
-          await updateDoc(doc.ref, {
-            readBy: arrayUnion(user.uid),
+        if (unreadMessages.length > 0) {
+          for (const doc of unreadMessages) {
+            await updateDoc(doc.ref, {
+              readBy: arrayUnion(user.uid),
+            });
+          }
+          // Réinitialiser unreadCount pour l'utilisateur actuel
+          await updateDoc(doc(db, "chats", id), {
+            [`unreadCount.${user.uid}`]: 0,
           });
         }
 
@@ -103,7 +109,7 @@ export default function ChatRoom() {
         senderId: user.uid,
         senderName: user.displayName,
         timestamp: serverTimestamp(),
-        readBy: [user.uid], // Initialiser readBy avec l'expéditeur
+        readBy: [user.uid],
       });
       await updateDoc(doc(db, "chats", id), {
         lastMessage: { text: msg.text, timestamp: serverTimestamp() },
