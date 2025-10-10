@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet, Image, Platform, Alert } from "react-native";
 import { useTheme } from "../hooks/useTheme";
 import { useFocusEffect } from "expo-router";
 import SwipeBar from "../components/SwipeBar";
@@ -9,32 +9,27 @@ import LottieView from "lottie-react-native";
 import chatAnimation from "../assets/animations/chat.json";
 
 export default function MyComponent() {
-  const { Colors, Fonts, Styles, theme } = useTheme();
+  const { Colors, Fonts, Styles } = useTheme();
   const styles = createStyles(Colors, Fonts, Styles);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [hasSeenModal, setHasSeenModal] = useState(false);
 
+  useEffect(() => {
+    if (!hasSeenModal) {
+      const timer = setTimeout(() => setModalVisible(true), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [hasSeenModal]);
+
   useFocusEffect(
     React.useCallback(() => {
-      setHasSeenModal(false);
-      setModalVisible(true);
-
-      return () => {
-        setModalVisible(false);
-      };
-    }, [])
-  );
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!modalVisible) {
-        setModalVisible(true);
+      if (!hasSeenModal) {
+        const timer = setTimeout(() => setModalVisible(true), 500);
+        return () => clearTimeout(timer);
       }
-    }, 5000);
-
-    return () => clearTimeout(timer);
-  }, [modalVisible]);
+    }, [hasSeenModal])
+  );
 
   const handleComplete = () => {
     setModalVisible(false);
@@ -43,11 +38,13 @@ export default function MyComponent() {
 
   return (
     <View style={styles.container}>
+      {/* Header avec logo */}
       <View style={styles.titleContainer}>
         <Image source={appIcon} style={styles.appIcon} />
         <Text style={styles.title}>FireChat</Text>
       </View>
 
+      {/* Animation Lottie */}
       <LottieView
         source={chatAnimation}
         autoPlay
@@ -56,6 +53,7 @@ export default function MyComponent() {
         style={styles.lottiestyle}
       />
 
+      {/* Modal */}
       <Modal
         isVisible={modalVisible}
         animationIn="slideInUp"
@@ -66,9 +64,9 @@ export default function MyComponent() {
         backdropTransitionOutTiming={500}
         backdropOpacity={0}
         onBackdropPress={() => {}}
-        useNativeDriver={true}
-        useNativeDriverForBackdrop={true}
-        hideModalContentWhileAnimating={true}
+        useNativeDriver
+        useNativeDriverForBackdrop
+        hideModalContentWhileAnimating
         style={styles.modal}
       >
         <View style={styles.modalContent}>
@@ -105,11 +103,6 @@ const createStyles = (Colors, Fonts, Styles) =>
       justifyContent: "center",
       gap: 5,
       alignSelf: "center",
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.23,
-      shadowRadius: 2.62,
-      elevation: 2,
     },
     appIcon: {
       width: 40,

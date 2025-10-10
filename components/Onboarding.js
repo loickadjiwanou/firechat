@@ -9,6 +9,7 @@ import {
   Dimensions,
   Platform,
   ActivityIndicator,
+  BackHandler,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
@@ -92,6 +93,22 @@ const Onboarding = () => {
   const { Colors, Fonts, Styles, theme } = useTheme();
   const styles = createStyles(Colors, Fonts, Styles);
 
+  useEffect(() => {
+    const backAction = () => {
+      if (activeIndex === 0) {
+        return true;
+      }
+      return false;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, [activeIndex]);
+
   const handleScroll = (direction) => {
     const newIndex = activeIndex + (direction === "right" ? 1 : -1);
     if (newIndex >= 0 && newIndex < onboardingData.length) {
@@ -149,12 +166,16 @@ const Onboarding = () => {
   return (
     <View style={styles.view}>
       <View style={styles.header}>
-        <Button
-          onPress={handleBackPress}
-          title="Back"
-          variant="text"
-          titleStyle={styles.headerButton}
-        />
+        {activeIndex === 0 ? (
+          <View />
+        ) : (
+          <Button
+            onPress={handleBackPress}
+            title="Back"
+            variant="text"
+            titleStyle={styles.headerButton}
+          />
+        )}
         {activeIndex === onboardingData.length - 1 ? (
           <View />
         ) : (
@@ -209,7 +230,7 @@ const createStyles = (Colors, Fonts, Styles) =>
     view: {
       flex: 1,
       backgroundColor: Colors.background,
-      paddingTop: Platform.OS === "android" ? StatusBar.currentHeight + 10 : 50,
+      paddingTop: Platform.OS === "android" ? 25 : 50,
     },
     container: {
       flex: 1,

@@ -46,7 +46,7 @@ const createStyles = (Colors, Fonts, Styles) =>
     container: {
       flex: 1,
       backgroundColor: Colors.background,
-      //   paddingTop: Platform.OS === "android" ? StatusBar.currentHeight + 10 : 50,
+      //   paddingTop: Platform.OS === "android" ? 25 : 50,
       paddingHorizontal: Styles.padding.sm,
     },
     placeholder: {
